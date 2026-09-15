@@ -23,7 +23,9 @@ import {
   Mail,
   Award,
   AlertTriangle,
+  Trash2,
 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface TeamMember {
   name: string;
@@ -32,7 +34,7 @@ interface TeamMember {
 }
 
 interface TeamRegistration {
-  id: number;
+  id: string | number;
   application_id: string;
   team_name: string;
   track: string;
@@ -49,7 +51,7 @@ interface TeamRegistration {
 }
 
 interface SponsorApplication {
-  id: number;
+  id: string | number;
   proposal_id: string;
   company_name: string;
   tier: string;
@@ -105,21 +107,16 @@ export const AdminPage: React.FC = () => {
     setLoginError(null);
 
     try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ passcode }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Authentication failed');
+      const validPasscode = import.meta.env.VITE_ADMIN_PASSCODE || 'arena2026!admin';
+      if (passcode.trim() !== validPasscode) {
+        throw new Error('Invalid admin passcode. Please enter the correct admin key.');
       }
 
-      sessionStorage.setItem('arena_admin_token', data.token);
-      setAuthToken(data.token);
+      const token = 'arena_admin_session_' + Date.now();
+      sessionStorage.setItem('arena_admin_token', token);
+      setAuthToken(token);
     } catch (err: any) {
-      setLoginError(err.message || 'Invalid passcode');
+      setLoginError(err.message || 'Authentication failed');
     } finally {
       setLoggingIn(false);
     }
@@ -136,29 +133,52 @@ export const AdminPage: React.FC = () => {
     if (!authToken) return;
     setLoadingData(true);
     try {
-      const headers = { Authorization: `Bearer ${authToken}` };
+      // 1. Fetch team registrations from Supabase
+      const { data: teamsData, error: teamsError } = await supabase
+        .from('team_registrations')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      const [teamsRes, sponsorsRes, statsRes] = await Promise.all([
-        fetch('/api/admin/registrations', { headers }),
-        fetch('/api/admin/sponsors', { headers }),
-        fetch('/api/admin/stats', { headers }),
-      ]);
-
-      if (teamsRes.status === 401 || teamsRes.status === 403) {
-        handleLogout();
-        return;
+      if (teamsError) {
+        throw teamsError;
       }
 
-      const [teamsData, sponsorsData, statsData] = await Promise.all([
-        teamsRes.json(),
-        sponsorsRes.json(),
-        statsRes.json(),
-      ]);
+      const loadedTeams: TeamRegistration[] = Array.isArray(teamsData) ? (teamsData as any) : [];
+      setTeams(loadedTeams);
 
-      setTeams(Array.isArray(teamsData) ? teamsData : []);
-      setSponsors(Array.isArray(sponsorsData) ? sponsorsData : []);
-      setStats(statsData);
-    } catch (err) {
+      // 2. Fetch sponsor proposals if table exists, otherwise empty array
+      let loadedSponsors: SponsorApplication[] = [];
+      try {
+        const { data: sponsorsData } = await supabase
+          .from('sponsor_applications')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (Array.isArray(sponsorsData)) {
+          loadedSponsors = sponsorsData as any;
+        }
+      } catch {
+        // Sponsors are handled via direct email, table is optional
+      }
+      setSponsors(loadedSponsors);
+
+      // 3. Calculate live stats
+      const totalTeams = loadedTeams.length;
+      const approvedTeams = loadedTeams.filter((t) => t.status === 'approved').length;
+      let totalBuilders = totalTeams;
+      loadedTeams.forEach((t) => {
+        if (Array.isArray(t.members)) {
+          totalBuilders += t.members.length;
+        }
+      });
+
+      setStats({
+        totalTeams,
+        approvedTeams,
+        totalBuilders,
+        totalSponsors: loadedSponsors.length,
+        approvedSponsors: loadedSponsors.filter((s) => s.status === 'approved').length,
+      });
+    } catch (err: any) {
       console.error('Error fetching admin data:', err);
     } finally {
       setLoadingData(false);
@@ -171,61 +191,56 @@ export const AdminPage: React.FC = () => {
     }
   }, [authToken]);
 
-  // Update Status
-  const updateTeamStatus = async (id: number, status: string) => {
+  // Update Team Status in Supabase
+  const updateTeamStatus = async (id: string | number, status: string) => {
     try {
-      const res = await fetch(`/api/admin/registrations/${id}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({ status }),
-      });
+      const { error } = await supabase
+        .from('team_registrations')
+        .update({ status })
+        .eq('id', id);
 
-      if (res.ok) {
-        setTeams((prev) =>
-          prev.map((t) => (t.id === id ? { ...t, status: status as any } : t))
-        );
-        if (selectedTeam && selectedTeam.id === id) {
-          setSelectedTeam({ ...selectedTeam, status: status as any });
-        }
-        // Refresh stats
-        fetch('/api/admin/stats', { headers: { Authorization: `Bearer ${authToken}` } })
-          .then((r) => r.json())
-          .then((s) => setStats(s))
-          .catch(() => {});
+      if (error) {
+        throw error;
       }
-    } catch (err) {
+
+      setTeams((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, status: status as any } : t))
+      );
+      if (selectedTeam && selectedTeam.id === id) {
+        setSelectedTeam({ ...selectedTeam, status: status as any });
+      }
+
+      // Update approved count in stats
+      setStats((prev) => {
+        if (!prev) return prev;
+        const newCount = teams.filter((t) =>
+          t.id === id ? status === 'approved' : t.status === 'approved'
+        ).length;
+        return { ...prev, approvedTeams: newCount };
+      });
+    } catch (err: any) {
       console.error('Failed to update team status:', err);
+      alert('Failed to update status in Supabase: ' + (err.message || 'Check RLS policies'));
     }
   };
 
-  const updateSponsorStatus = async (id: number, status: string) => {
+  // Update Sponsor Status in Supabase (if used)
+  const updateSponsorStatus = async (id: string | number, status: string) => {
     try {
-      const res = await fetch(`/api/admin/sponsors/${id}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({ status }),
-      });
+      const { error } = await supabase
+        .from('sponsor_applications')
+        .update({ status })
+        .eq('id', id);
 
-      if (res.ok) {
-        setSponsors((prev) =>
-          prev.map((s) => (s.id === id ? { ...s, status: status as any } : s))
-        );
-        if (selectedSponsor && selectedSponsor.id === id) {
-          setSelectedSponsor({ ...selectedSponsor, status: status as any });
-        }
-        // Refresh stats
-        fetch('/api/admin/stats', { headers: { Authorization: `Bearer ${authToken}` } })
-          .then((r) => r.json())
-          .then((s) => setStats(s))
-          .catch(() => {});
+      if (error) throw error;
+
+      setSponsors((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, status: status as any } : s))
+      );
+      if (selectedSponsor && selectedSponsor.id === id) {
+        setSelectedSponsor({ ...selectedSponsor, status: status as any });
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to update sponsor status:', err);
     }
   };

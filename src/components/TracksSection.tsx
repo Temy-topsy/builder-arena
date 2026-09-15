@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { TRACKS_DATA } from '../data/hackathonData';
 import { Track } from '../types';
 import { TrackModal } from './TrackModal';
@@ -11,12 +10,9 @@ export const TracksSection: React.FC = () => {
   return (
     <section id="tracks" className="py-28 sm:py-36 relative bg-neo-hero border-t-3 border-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20 space-y-4 flex flex-col items-center">
-          <span className="neo-tag">
-            CHALLENGE VERTICALS
-          </span>
           <div className="inline-block bg-white text-black border-3 border-black px-6 sm:px-10 py-3 sm:py-4 rounded-md shadow-[6px_6px_0px_#000000]">
             <h2 className="font-display font-extrabold text-3xl sm:text-5xl uppercase tracking-tight">
               FOUR WAYS TO BUILD
@@ -30,12 +26,8 @@ export const TracksSection: React.FC = () => {
         {/* 4 Neo-Brutalist Track Cards with Rich Banner Images */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {TRACKS_DATA.map((track, idx) => (
-            <motion.div
+            <div
               key={track.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.1 }}
               className="bg-white text-black border-3 border-black rounded-md overflow-hidden relative group shadow-[8px_8px_0px_#000000] hover:translate-x-1 hover:translate-y-1 hover:shadow-[3px_3px_0px_#000000] transition-all flex flex-col justify-between"
               data-cursor={track.name}
             >
@@ -100,7 +92,7 @@ export const TracksSection: React.FC = () => {
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

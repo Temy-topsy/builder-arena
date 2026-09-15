@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { TIMELINE_STEPS, SCHEDULE_DAYS } from '../data/hackathonData';
 
 export const TimelineSection: React.FC = () => {
@@ -8,12 +7,9 @@ export const TimelineSection: React.FC = () => {
   return (
     <section id="schedule" className="py-28 sm:py-36 relative bg-neo-hero border-t-3 border-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20 space-y-4 flex flex-col items-center">
-          <span className="neo-tag">
-            HOW THE HACKATHON WORKS
-          </span>
 
           <div className="inline-block bg-white text-black border-3 border-black px-6 sm:px-10 py-3 sm:py-4 rounded-md shadow-[6px_6px_0px_#000000]">
             <h2 className="font-display font-extrabold text-3xl sm:text-5xl uppercase tracking-tight">
@@ -32,13 +28,9 @@ export const TimelineSection: React.FC = () => {
             {/* Connecting line */}
             <div className="absolute top-6 left-8 right-8 h-1.5 bg-black z-0" />
 
-            {TIMELINE_STEPS.map((step, idx) => (
-              <motion.div
+            {TIMELINE_STEPS.map((step) => (
+              <div
                 key={step.stepNumber}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: idx * 0.08 }}
                 className="flex flex-col items-center relative z-10 text-center w-28 group"
                 data-cursor={step.title}
               >
@@ -51,7 +43,7 @@ export const TimelineSection: React.FC = () => {
                 <p className="text-xs text-white/90 font-sans font-normal leading-snug hidden sm:block">
                   {step.description}
                 </p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -61,9 +53,6 @@ export const TimelineSection: React.FC = () => {
           {/* Day Tabs */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-3 border-black pb-6 mb-8">
             <div>
-              <span className="neo-tag text-[10px]">
-                EVENT RUN OF SHOW
-              </span>
               <h3 className="font-display font-black text-2xl uppercase mt-1">HACKATHON SCHEDULE</h3>
             </div>
 
@@ -72,11 +61,10 @@ export const TimelineSection: React.FC = () => {
                 <button
                   key={idx}
                   onClick={() => setActiveDay(idx)}
-                  className={`px-4 py-2 rounded-md font-mono text-xs font-bold border-2 border-black transition-all ${
-                    activeDay === idx
-                      ? 'bg-yellow-300 text-black shadow-[3px_3px_0px_#000000]'
-                      : 'bg-white text-black hover:bg-black hover:text-white'
-                  }`}
+                  className={`px-4 py-2 rounded-md font-mono text-xs font-bold border-2 border-black transition-all ${activeDay === idx
+                    ? 'bg-yellow-300 text-black shadow-[3px_3px_0px_#000000]'
+                    : 'bg-white text-black hover:bg-black hover:text-white'
+                    }`}
                 >
                   {day.dayTitle}
                 </button>

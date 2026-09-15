@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Users, Cpu, ShieldCheck, Award, Mail, ArrowRight } from 'lucide-react';
 
 export const SponsorSection: React.FC = () => {
@@ -52,12 +51,8 @@ export const SponsorSection: React.FC = () => {
           {valuePillars.map((pillar, idx) => {
             const Icon = pillar.icon;
             return (
-              <motion.div
+              <div
                 key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: idx * 0.08 }}
                 className="bg-white text-black p-6 sm:p-7 rounded-lg border-3 border-black shadow-[6px_6px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[3px_3px_0px_#000000] transition-all flex flex-col justify-between"
               >
                 <div className="w-12 h-12 rounded-md bg-black text-white border-2 border-black flex items-center justify-center shadow-[3px_3px_0px_#000000] mb-5">
@@ -69,17 +64,13 @@ export const SponsorSection: React.FC = () => {
                 <p className="text-gray-700 text-xs sm:text-sm font-sans font-normal leading-relaxed">
                   {pillar.desc}
                 </p>
-              </motion.div>
+              </div>
             );
           })}
         </div>
 
         {/* Clean Pitch Deck Request Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+        <div
           className="bg-white text-black border-3 border-black rounded-xl p-8 sm:p-12 shadow-[8px_8px_0px_#000000] max-w-4xl mx-auto text-center space-y-6"
         >
           <span className="neo-tag">
@@ -116,7 +107,7 @@ export const SponsorSection: React.FC = () => {
               <span>CHAT VIA WHATSAPP</span>
             </a>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Terminal, Users, Code, Award, Zap } from 'lucide-react';
 
 export const AboutOTCSection: React.FC = () => {
@@ -17,13 +16,7 @@ export const AboutOTCSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: OTC Narrative */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="lg:col-span-6 space-y-6"
-          >
+          <div className="lg:col-span-6 space-y-6">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-md bg-white border-3 border-black flex items-center justify-center p-1.5 shadow-[4px_4px_0px_#000000] shrink-0 overflow-hidden">
                 <img
@@ -65,16 +58,10 @@ export const AboutOTCSection: React.FC = () => {
                 );
               })}
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Column: Achievements Box */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="lg:col-span-6 bg-black text-white border-3 border-black rounded-md p-8 space-y-6 shadow-[8px_8px_0px_#000000]"
-          >
+          <div className="lg:col-span-6 bg-black text-white border-3 border-black rounded-md p-8 space-y-6 shadow-[8px_8px_0px_#000000]">
             <h3 className="font-display font-black text-xl text-[#00D9FF] uppercase flex items-center gap-2 border-b-2 border-white/30 pb-3">
               <Zap className="w-5 h-5 text-[#00D9FF]" />
               COMMUNITY IMPACT HIGHLIGHTS
@@ -84,16 +71,16 @@ export const AboutOTCSection: React.FC = () => {
               <div className="p-4 rounded bg-white text-black border-2 border-black shadow-[4px_4px_0px_#000000] flex items-start gap-3">
                 <span className="bg-black text-[#00D9FF] font-mono font-black text-xs px-2 py-1 rounded">01</span>
                 <div>
-                  <strong className="text-black block font-display font-black">1,500+ Student Developers Trained</strong>
-                  <span className="text-gray-700 text-xs font-normal">Conducted hands-on workshops in Web Dev, Mobile, AI & Cloud.</span>
+                  <strong className="text-black block font-display font-black">500+ Student Developers Trained</strong>
+                  <span className="text-gray-700 text-xs font-normal">Active bootcamps across Web Development, Mobile Dev, UI/UX, and AI tooling.</span>
                 </div>
               </div>
 
               <div className="p-4 rounded bg-white text-black border-2 border-black shadow-[4px_4px_0px_#000000] flex items-start gap-3">
                 <span className="bg-black text-[#00D9FF] font-mono font-black text-xs px-2 py-1 rounded">02</span>
                 <div>
-                  <strong className="text-black block font-display font-black">Active Campus Developer Hub</strong>
-                  <span className="text-gray-700 text-xs font-normal">Fostering peer-to-peer technical mentorship and open-source contributions.</span>
+                  <strong className="text-black block font-display font-black">Annual Flagship Tech Summit</strong>
+                  <span className="text-gray-700 text-xs font-normal">Gathering 1,000+ students, industry founders, and tech executives yearly on campus.</span>
                 </div>
               </div>
 
@@ -105,7 +92,7 @@ export const AboutOTCSection: React.FC = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

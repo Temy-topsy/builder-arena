@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { BookOpen, Globe, Check } from 'lucide-react';
 
 export const BigQuestionSection: React.FC = () => {
@@ -45,13 +44,7 @@ export const BigQuestionSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           
           {/* LEFT: THE CLASSROOM */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="bg-white text-black border-3 border-black rounded-md overflow-hidden relative shadow-[8px_8px_0px_#000000] space-y-6 flex flex-col justify-between"
-          >
+          <div className="bg-white text-black border-3 border-black rounded-md overflow-hidden relative shadow-[8px_8px_0px_#000000] space-y-6 flex flex-col justify-between">
             {/* Image Header */}
             <div className="relative h-48 w-full border-b-3 border-black bg-black">
               <img
@@ -86,16 +79,10 @@ export const BigQuestionSection: React.FC = () => {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* RIGHT: THE REAL WORLD */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="bg-[#00D9FF] text-black border-3 border-black rounded-md overflow-hidden relative shadow-[8px_8px_0px_#000000] space-y-6 flex flex-col justify-between"
-          >
+          <div className="bg-[#00D9FF] text-black border-3 border-black rounded-md overflow-hidden relative shadow-[8px_8px_0px_#000000] space-y-6 flex flex-col justify-between">
             {/* Image Header */}
             <div className="relative h-48 w-full border-b-3 border-black bg-black">
               <img
@@ -132,7 +119,7 @@ export const BigQuestionSection: React.FC = () => {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Core Statement Banner */}

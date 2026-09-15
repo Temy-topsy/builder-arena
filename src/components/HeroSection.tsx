@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { MapPin, Calendar, ArrowRight, Zap, Star } from 'lucide-react';
 
@@ -25,47 +24,32 @@ export const HeroSection: React.FC = () => {
         {/* HEADLINE STACK WITH GENEROUS BREATHING ROOM */}
         <div className="relative space-y-3 sm:space-y-4 mb-12 sm:mb-16 text-center">
           {/* Line 1: Builders */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-            className="inline-block bg-white text-black border-3 border-black rounded-md px-6 sm:px-12 py-2 sm:py-3 shadow-[6px_6px_0px_#000000]"
-          >
+          <div className="inline-block bg-white text-black border-3 border-black rounded-md px-6 sm:px-12 py-2 sm:py-3 shadow-[6px_6px_0px_#000000]">
             <h1 className="font-display font-extrabold text-4xl sm:text-6xl md:text-8xl tracking-tight leading-none uppercase">
               Builders
             </h1>
-          </motion.div>
+          </div>
 
           <br />
 
           {/* Line 2: Arena */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="inline-block bg-white text-black border-3 border-black rounded-md px-6 sm:px-12 py-2 sm:py-3 shadow-[6px_6px_0px_#000000]"
-          >
+          <div className="inline-block bg-white text-black border-3 border-black rounded-md px-6 sm:px-12 py-2 sm:py-3 shadow-[6px_6px_0px_#000000]">
             <h1 className="font-display font-extrabold text-4xl sm:text-6xl md:text-8xl tracking-tight leading-none uppercase">
               Arena
             </h1>
-          </motion.div>
+          </div>
 
           <br />
 
           {/* Line 3: Hackathon 2026 */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="inline-flex items-center gap-3 sm:gap-4 bg-yellow-300 text-black border-3 border-black rounded-md px-5 sm:px-10 py-2 sm:py-3 shadow-[6px_6px_0px_#000000]"
-          >
+          <div className="inline-flex items-center gap-3 sm:gap-4 bg-yellow-300 text-black border-3 border-black rounded-md px-5 sm:px-10 py-2 sm:py-3 shadow-[6px_6px_0px_#000000]">
             <h1 className="font-display font-extrabold text-3xl sm:text-5xl md:text-7xl tracking-tight leading-none uppercase">
               Hackathon
             </h1>
             <span className="bg-black text-white font-mono text-lg sm:text-2xl font-black px-2.5 sm:px-3 py-1 rounded border-2 border-black">
               2026
             </span>
-          </motion.div>
+          </div>
         </div>
 
         {/* CTAS */}

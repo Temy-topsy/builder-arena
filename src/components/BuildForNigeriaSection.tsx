@@ -1,12 +1,11 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { NIGERIAN_PROBLEMS } from '../data/hackathonData';
 import { Target, ArrowDown } from 'lucide-react';
 
 export const BuildForNigeriaSection: React.FC = () => {
   return (
     <section className="py-28 sm:py-36 relative bg-neo-hero border-t-3 border-black overflow-hidden">
-      
+
       {/* Background Tech Image Overlay */}
       <img
         src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1200&auto=format&fit=crop"
@@ -15,12 +14,9 @@ export const BuildForNigeriaSection: React.FC = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20 flex flex-col items-center gap-4">
-          <span className="neo-tag">
-            NIGERIAN PROBLEM MATRIX
-          </span>
 
           <div className="inline-block bg-white text-black border-3 border-black px-6 sm:px-10 py-3 sm:py-4 rounded-md shadow-[6px_6px_0px_#000000]">
             <h2 className="font-display font-extrabold text-3xl sm:text-6xl uppercase tracking-tight">
@@ -33,15 +29,11 @@ export const BuildForNigeriaSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Animated Nigerian Problem Statement Cards */}
+        {/* Nigerian Problem Statement Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-16">
           {NIGERIAN_PROBLEMS.map((problem, idx) => (
-            <motion.div
+            <div
               key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.08 }}
               className="bg-white text-black border-3 border-black p-6 rounded-lg shadow-[6px_6px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[3px_3px_0px_#000000] transition-all flex items-start gap-4 group"
               data-cursor="PROBLEM"
             >
@@ -56,18 +48,13 @@ export const BuildForNigeriaSection: React.FC = () => {
                   "{problem}"
                 </p>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* Down Indicator Button */}
         <div className="text-center space-y-3 flex flex-col items-center">
-          <span className="neo-tag-accent">
-            EXPLORE SOLUTION TRACKS BELOW
-          </span>
-          <div className="w-12 h-12 rounded bg-white text-black border-3 border-black shadow-[4px_4px_0px_#000000] flex items-center justify-center animate-bounce">
-            <ArrowDown className="w-6 h-6 stroke-[3]" />
-          </div>
+
         </div>
       </div>
     </section>

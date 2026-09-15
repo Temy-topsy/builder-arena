@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { IN_KIND_PARTNERS } from '../data/hackathonData';
 import { Link } from 'react-router-dom';
 import { Handshake, ArrowRight } from 'lucide-react';
@@ -30,12 +29,8 @@ export const InKindPartnersSection: React.FC = () => {
         {/* 4 Neo-Brutalist Chunky Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {IN_KIND_PARTNERS.map((partner, idx) => (
-            <motion.div
+            <div
               key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.1 }}
               className="bg-white text-black border-3 border-black rounded-md p-6 relative shadow-[6px_6px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#000000] transition-all"
             >
               <div className="mb-4 p-2.5 bg-[#00D9FF] rounded border-2 border-black inline-flex items-center justify-center shadow-[2px_2px_0px_#000000]">
@@ -47,7 +42,7 @@ export const InKindPartnersSection: React.FC = () => {
               <p className="text-gray-800 text-xs sm:text-sm font-sans font-normal leading-relaxed">
                 {partner.detail}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
 

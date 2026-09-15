@@ -6,6 +6,7 @@ import { Footer } from '../components/Footer';
 import { CustomCursor } from '../components/CustomCursor';
 import { Zap, Plus, Trash2, ArrowRight, ArrowLeft, CheckCircle2, Check, AlertTriangle } from 'lucide-react';
 import { RegistrationFormData } from '../types';
+import { supabase } from '../lib/supabase';
 
 export const RegisterPage: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -66,29 +67,35 @@ export const RegisterPage: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          teamName: formData.teamName,
-          track: formData.track,
-          teamLeadName: formData.teamLeadName,
-          teamLeadEmail: formData.teamLeadEmail,
-          teamLeadPhone: formData.teamLeadPhone,
-          matricNumber: formData.department,
-          departmentLevel: formData.university,
-          members: formData.members,
-          githubPortfolio: formData.githubPortfolio,
-          problemStatement: `${formData.projectIdea}\n\nWhy selected: ${formData.whySelected}`,
-        }),
-      });
+      const randNum = Math.floor(1000 + Math.random() * 9000);
+      const applicationId = `BA2026-APP-${randNum}`;
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit registration. Please try again.');
+      const { data, error: insertError } = await supabase
+        .from('team_registrations')
+        .insert([
+          {
+            application_id: applicationId,
+            team_name: formData.teamName,
+            track: formData.track,
+            team_lead_name: formData.teamLeadName,
+            team_lead_email: formData.teamLeadEmail,
+            team_lead_phone: formData.teamLeadPhone,
+            matric_number: formData.department,
+            department_level: formData.university,
+            members: formData.members,
+            github_portfolio: formData.githubPortfolio,
+            problem_statement: `${formData.projectIdea}\n\nWhy selected: ${formData.whySelected}`,
+            status: 'under_review',
+          },
+        ])
+        .select()
+        .single();
+
+      if (insertError) {
+        throw new Error(insertError.message || 'Failed to submit registration. Please try again.');
       }
 
-      setApplicationRecord(data.application);
+      setApplicationRecord(data);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
@@ -461,7 +468,7 @@ export const RegisterPage: React.FC = () => {
               }`}
             >
               <Zap className="w-5 h-5 text-black fill-black" />
-              <span>{loading ? 'SUBMITTING TO NEON DATABASE...' : 'SUBMIT HACKATHON APPLICATION'}</span>
+              <span>{loading ? 'SUBMITTING APPLICATION...' : 'SUBMIT HACKATHON APPLICATION'}</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           </form>

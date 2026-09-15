@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { NUMBERS_METRICS } from '../data/hackathonData';
 import { TrendingUp, Quote } from 'lucide-react';
 
@@ -22,15 +21,11 @@ export const NumbersSection: React.FC = () => {
           </div>
         </div>
 
-        {/* 6 Animated Metrics Grid */}
+        {/* 6 Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-16">
           {NUMBERS_METRICS.map((metric, idx) => (
-            <motion.div
+            <div
               key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.08 }}
               className="bg-white text-black border-3 border-black p-5 rounded-md text-center shadow-[5px_5px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#000000] transition-all"
             >
               <div className="font-display font-black text-3xl sm:text-4xl text-black mb-1">
@@ -39,18 +34,12 @@ export const NumbersSection: React.FC = () => {
               <div className="font-mono text-[10px] sm:text-xs font-black text-black uppercase tracking-wider">
                 {metric.label}
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* Core Funding Quote Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="bg-black text-white border-3 border-black rounded-md p-8 sm:p-12 text-center max-w-4xl mx-auto shadow-[8px_8px_0px_#000000] relative space-y-4"
-        >
+        <div className="bg-black text-white border-3 border-black rounded-md p-8 sm:p-12 text-center max-w-4xl mx-auto shadow-[8px_8px_0px_#000000] relative space-y-4">
           <Quote className="w-12 h-12 text-[#00D9FF] mx-auto" />
           <p className="font-display font-extrabold text-2xl sm:text-4xl uppercase leading-tight">
             "WE ARE NOT JUST ASKING FOR FUNDING."
@@ -58,7 +47,7 @@ export const NumbersSection: React.FC = () => {
           <p className="font-sans text-base sm:text-xl text-[#00D9FF] font-black">
             We're offering access, talent, innovation and measurable growth.
           </p>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

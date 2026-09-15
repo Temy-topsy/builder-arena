@@ -50,40 +50,51 @@ export const SponsorApplyPage: React.FC = () => {
     }
   };
 
+  const generateMailtoUrl = () => {
+    const subject = encodeURIComponent(
+      `Builders Arena 2026 Sponsorship Inquiry - ${formData.companyName || 'Brand'} (${formData.tier.toUpperCase()} Tier)`
+    );
+    const body = encodeURIComponent(
+      `Hello OOU Tech Community (OTC) Team,\n\n` +
+      `We are interested in partnering with Builders Arena 2026 as a sponsor.\n\n` +
+      `SPONSOR DETAILS:\n` +
+      `• Company Name: ${formData.companyName}\n` +
+      `• Website: ${formData.companyWebsite || 'N/A'}\n` +
+      `• Industry: ${formData.industry}\n` +
+      `• Selected Tier: ${formData.tier.toUpperCase()} (${getTierPrice(formData.tier)})\n` +
+      `• Primary Contact: ${formData.contactName}\n` +
+      `• Email: ${formData.contactEmail}\n` +
+      `• Phone: ${formData.contactPhone}\n` +
+      `• Contribution Interests: ${formData.contributionType.join(', ') || 'Financial Sponsorship'}\n` +
+      `• Custom Requests / Goals:\n${formData.notes || 'Looking forward to receiving the sponsorship deck and MOU.'}\n\n` +
+      `Best regards,\n${formData.contactName}`
+    );
+    return `mailto:ooutechcommunity@gmail.com?subject=${subject}&body=${body}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/sponsor-apply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          companyName: formData.companyName,
-          tier: formData.tier,
-          contactName: formData.contactName,
-          contactEmail: formData.contactEmail,
-          contactPhone: formData.contactPhone,
-          companyWebsite: formData.companyWebsite,
-          industry: formData.industry,
-          sponsorshipGoals: formData.notes,
-          participationTypes: formData.contributionType,
-          customRequests: formData.notes,
-        }),
+      const randNum = Math.floor(1000 + Math.random() * 9000);
+      const proposalId = `BA2026-SPONSOR-${randNum}`;
+
+      setProposalRecord({
+        proposal_id: proposalId,
+        ...formData,
+        status: 'inquiry_sent',
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit sponsorship application.');
-      }
+      const mailtoUrl = generateMailtoUrl();
+      window.location.href = mailtoUrl;
 
-      setProposalRecord(data.proposal);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
       console.error('Sponsorship submit error:', err);
-      setError(err.message || 'Network error occurred while submitting.');
+      setError('Could not open your email client. You can also email ooutechcommunity@gmail.com directly.');
     } finally {
       setLoading(false);
     }
@@ -181,22 +192,36 @@ export const SponsorApplyPage: React.FC = () => {
             </div>
 
             <p className="text-xs text-gray-700 font-sans font-normal">
-              Our sponsorship desk will reach out to <strong className="text-black underline font-semibold">{formData.contactEmail}</strong> ({formData.contactPhone}) with full pitch deck details and MOU documentation.
+              Your default email client was opened with your pre-filled inquiry. Our partnership desk will follow up at <strong className="text-black underline font-semibold">{formData.contactEmail}</strong> with full deck details and documentation.
             </p>
 
             <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href={generateMailtoUrl()}
+                className="neo-btn-primary px-8 py-3.5 text-xs font-display uppercase tracking-wider flex items-center justify-center gap-2"
+              >
+                <Mail className="w-4 h-4" />
+                <span>OPEN EMAIL APP AGAIN</span>
+              </a>
+
+              <a
+                href={`https://wa.me/2348061764593?text=${encodeURIComponent(
+                  `Hello OTC Team, I just submitted a sponsorship inquiry for ${formData.companyName} (${formData.tier.toUpperCase()} Tier). Looking forward to connecting!`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="neo-btn-secondary px-8 py-3.5 text-xs font-mono uppercase font-bold flex items-center justify-center gap-2"
+              >
+                <Phone className="w-4 h-4 text-emerald-600" />
+                <span>CHAT ON WHATSAPP</span>
+              </a>
+
               <Link
                 to="/"
-                className="neo-btn-primary px-8 py-3.5 text-xs font-display uppercase tracking-wider"
+                className="bg-black text-white px-8 py-3.5 text-xs font-display uppercase tracking-wider rounded border-2 border-black hover:bg-white hover:text-black transition-colors"
               >
-                RETURN HOME
+                HOME
               </Link>
-              <button
-                onClick={() => setSubmitted(false)}
-                className="neo-btn-secondary px-8 py-3.5 text-xs font-mono uppercase font-bold"
-              >
-                SUBMIT ANOTHER PROPOSAL
-              </button>
             </div>
           </motion.div>
         ) : (
@@ -411,7 +436,7 @@ export const SponsorApplyPage: React.FC = () => {
               }`}
             >
               <Crown className="w-5 h-5 text-black fill-black" />
-              <span>{loading ? 'SUBMITTING TO NEON DATABASE...' : 'SUBMIT SPONSORSHIP PROPOSAL'}</span>
+              <span>SEND SPONSORSHIP INQUIRY VIA EMAIL</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           </form>

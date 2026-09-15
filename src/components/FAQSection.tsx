@@ -13,17 +13,14 @@ export const FAQSection: React.FC = () => {
   return (
     <section id="faq" className="py-24 relative bg-neo-hero border-t-3 border-black">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Header */}
         <div className="text-center mb-16 space-y-4 flex flex-col items-center">
-          <span className="neo-tag flex items-center gap-1.5">
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>FREQUENTLY ASKED QUESTIONS</span>
-          </span>
+
 
           <div className="inline-block bg-white text-black border-3 border-black px-8 py-3 rounded-md shadow-[6px_6px_0px_#000000]">
             <h2 className="font-display font-extrabold text-4xl sm:text-5xl uppercase tracking-tight">
-              GOT QUESTIONS?
+              FAQs
             </h2>
           </div>
         </div>
@@ -48,9 +45,8 @@ export const FAQSection: React.FC = () => {
                     {faq.q}
                   </span>
                   <ChevronDown
-                    className={`w-5 h-5 shrink-0 transition-transform ${
-                      isOpen ? 'rotate-180' : ''
-                    }`}
+                    className={`w-5 h-5 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''
+                      }`}
                   />
                 </button>
 
