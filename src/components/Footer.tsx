@@ -82,7 +82,7 @@ export const Footer: React.FC = () => {
             {/* Social Icons */}
             <div className="flex items-center gap-2.5 pt-2">
               <a
-                href="https://substack.com"
+                href="https://substack.com/@ooutechcommunity"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Substack"
