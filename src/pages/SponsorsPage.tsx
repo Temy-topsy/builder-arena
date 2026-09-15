@@ -3,7 +3,6 @@ import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { CustomCursor } from '../components/CustomCursor';
 import { SponsorSection } from '../components/SponsorSection';
-import { InKindPartnersSection } from '../components/InKindPartnersSection';
 
 export const SponsorsPage: React.FC = () => {
   return (
@@ -12,7 +11,6 @@ export const SponsorsPage: React.FC = () => {
       <Navbar />
       <div className="pt-20">
         <SponsorSection />
-        <InKindPartnersSection />
       </div>
       <Footer />
     </div>

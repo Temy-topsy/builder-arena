@@ -9,20 +9,20 @@ export const TracksSection: React.FC = () => {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
 
   return (
-    <section id="tracks" className="py-24 relative bg-neo-hero border-t-3 border-black">
+    <section id="tracks" className="py-28 sm:py-36 relative bg-neo-hero border-t-3 border-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4 flex flex-col items-center">
+        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20 space-y-4 flex flex-col items-center">
           <span className="neo-tag">
             CHALLENGE VERTICALS
           </span>
-          <div className="inline-block bg-white text-black border-3 border-black px-8 py-3 rounded-md shadow-[6px_6px_0px_#000000]">
-            <h2 className="font-display font-extrabold text-4xl sm:text-6xl uppercase tracking-tight">
+          <div className="inline-block bg-white text-black border-3 border-black px-6 sm:px-10 py-3 sm:py-4 rounded-md shadow-[6px_6px_0px_#000000]">
+            <h2 className="font-display font-extrabold text-3xl sm:text-5xl uppercase tracking-tight">
               FOUR WAYS TO BUILD
             </h2>
           </div>
-          <p className="font-sans font-medium text-lg text-white bg-black px-6 py-2 rounded-md border-2 border-black shadow-[4px_4px_0px_#000000]">
+          <p className="font-sans font-normal text-base sm:text-lg text-white max-w-2xl text-center leading-relaxed drop-shadow-sm pt-2">
             Choose your challenge vertical and turn ambitious technical ideas into production software.
           </p>
         </div>
@@ -44,13 +44,16 @@ export const TracksSection: React.FC = () => {
                 <img
                   src={track.imageUrl}
                   alt={track.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = '/ai&software.png';
+                  }}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
                 <div className="absolute top-4 left-4 flex items-center gap-2">
-                  <div className="w-12 h-12 rounded bg-[#00D9FF] text-black border-2 border-black flex items-center justify-center shadow-[3px_3px_0px_#000000]">
-                    <track.icon className="w-6 h-6 text-black stroke-[2.5]" />
+                  <div className="w-11 h-11 rounded-md bg-white text-black border-2 border-black flex items-center justify-center shadow-[3px_3px_0px_#000000]">
+                    <track.icon className="w-5 h-5 text-black stroke-[2]" />
                   </div>
                   <span className="neo-tag bg-black text-white">
                     TRACK 0{idx + 1}

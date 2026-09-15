@@ -29,30 +29,31 @@ export const Navbar: React.FC = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-200 ${
         scrolled
-          ? 'bg-black text-white border-b-3 border-black py-3 shadow-[0_6px_0px_#000000]'
-          : 'bg-transparent py-5'
+          ? 'bg-black text-white border-b-2 border-black py-2 shadow-md'
+          : 'bg-transparent py-2.5 sm:py-3'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Brand Logo - Solid Neo Brutalist Badge */}
-        <Link to="/" className="flex items-center gap-3 group" data-cursor="BUILDERS">
-          <div className="bg-white text-black font-display font-black px-3 py-1.5 rounded-md border-3 border-black shadow-[4px_4px_0px_#000000] text-sm uppercase">
-            OTC <span className="text-[#00D9FF] bg-black px-1.5 py-0.5 rounded ml-1">BUILDERS ARENA</span>
-          </div>
+        {/* Brand Logo - Clean, Compact OTC Logo */}
+        <Link to="/" className="flex items-center group">
+          <img
+            src="/otc-logo.jpg"
+            alt="OTC Logo"
+            className="h-8 sm:h-9 w-auto rounded object-contain transition-transform group-hover:scale-105"
+          />
         </Link>
 
-        {/* Desktop Navigation Pills (Neo-Brutalist Boxes) */}
-        <nav className="hidden lg:flex items-center gap-2 bg-white px-4 py-2 rounded-md border-3 border-black shadow-[5px_5px_0px_#000000]">
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center gap-1 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-md border-2 border-black shadow-[3px_3px_0px_#000000]">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.label}
                 to={item.path}
-                className={`text-xs font-mono font-black uppercase tracking-wider px-3 py-1 rounded transition-colors ${
-                  isActive ? 'bg-black text-[#00D9FF]' : 'text-black hover:bg-black hover:text-white'
+                className={`text-xs font-sans font-medium px-3 py-1 rounded transition-colors ${
+                  isActive ? 'bg-black text-white font-semibold' : 'text-gray-800 hover:text-black hover:bg-gray-100'
                 }`}
-                data-cursor={item.label.toUpperCase()}
               >
                 {item.label}
               </Link>
@@ -61,57 +62,53 @@ export const Navbar: React.FC = () => {
         </nav>
 
         {/* Action Buttons */}
-        <div className="hidden sm:flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-2.5">
           <Link
             to="/sponsors"
-            className="neo-btn-secondary px-4 py-2 text-xs uppercase"
-            data-cursor="SPONSOR"
+            className="px-3.5 py-1.5 text-xs font-sans font-semibold rounded-md border-2 border-black bg-white text-black hover:bg-gray-100 transition-colors shadow-[2px_2px_0px_#000000]"
           >
-            SPONSOR
+            Sponsor
           </Link>
           <Link
             to="/register"
-            className="neo-btn-primary px-4 py-2 text-xs uppercase flex items-center gap-1.5"
-            data-cursor="REGISTER"
+            className="px-4 py-1.5 text-xs font-sans font-semibold rounded-md border-2 border-black bg-yellow-300 text-black hover:bg-yellow-400 transition-colors shadow-[2px_2px_0px_#000000] flex items-center gap-1.5"
           >
-            <Zap className="w-3.5 h-3.5 fill-black" />
-            <span>REGISTER TEAM</span>
+            <span>Register Team</span>
           </Link>
         </div>
 
         {/* Mobile Hamburger Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden p-2 text-black bg-white rounded-md border-3 border-black shadow-[3px_3px_0px_#000000]"
+          className="lg:hidden p-1.5 text-black bg-white rounded-md border-2 border-black shadow-[2px_2px_0px_#000000]"
           aria-label="Toggle Navigation"
         >
-          {mobileMenuOpen ? <X className="w-6 h-6 text-black" /> : <Menu className="w-6 h-6 text-black" />}
+          {mobileMenuOpen ? <X className="w-5 h-5 text-black" /> : <Menu className="w-5 h-5 text-black" />}
         </button>
       </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white text-black border-b-3 border-black px-4 pt-4 pb-6 space-y-3 shadow-[0_6px_0px_#000000]">
-          <div className="flex flex-col gap-2">
+        <div className="lg:hidden bg-white text-black border-b-2 border-black px-4 pt-3 pb-5 space-y-3 shadow-lg">
+          <div className="flex flex-col gap-1.5">
             {navItems.map((item) => (
               <Link
                 key={item.label}
                 to={item.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-base font-display font-bold uppercase text-black hover:bg-black hover:text-white px-3 py-2 rounded border border-black"
+                className="text-sm font-sans font-medium text-gray-900 hover:bg-gray-100 px-3 py-2 rounded"
               >
                 {item.label}
               </Link>
             ))}
           </div>
-          <div className="pt-4 border-t-2 border-black flex flex-col gap-2">
+          <div className="pt-3 border-t border-gray-200 flex flex-col gap-2">
             <Link
               to="/register"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center neo-btn-primary py-3 flex items-center justify-center gap-2"
+              className="w-full text-center py-2.5 bg-yellow-300 text-black rounded-md border-2 border-black font-sans font-semibold text-sm shadow-[2px_2px_0px_#000000]"
             >
-              <Zap className="w-4 h-4 fill-black" />
-              REGISTER YOUR TEAM
+              Register Team
             </Link>
           </div>
         </div>

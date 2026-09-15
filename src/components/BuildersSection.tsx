@@ -11,129 +11,104 @@ export const BuildersSection: React.FC = () => {
     : BUILDER_PROFILES.filter((p) => p.category === filter);
 
   return (
-    <section id="mentors" className="py-24 relative bg-neo-hero border-t-3 border-black">
+    <section id="mentors" className="py-28 sm:py-36 relative bg-neo-hero border-t-3 border-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4 flex flex-col items-center">
-          <span className="neo-tag flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 fill-white" />
-            <span>EXECUTIVE TEAM & MENTORS</span>
+        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20 space-y-4 flex flex-col items-center">
+          <span className="neo-tag">
+            EXECUTIVE TEAM & MENTORS
           </span>
 
-          <div className="inline-block bg-white text-black border-3 border-black px-8 py-3 rounded-md shadow-[6px_6px_0px_#000000]">
-            <h2 className="font-display font-extrabold text-4xl sm:text-6xl uppercase tracking-tight">
+          <div className="inline-block bg-white text-black border-3 border-black px-6 sm:px-10 py-3 sm:py-4 rounded-md shadow-[6px_6px_0px_#000000]">
+            <h2 className="font-display font-extrabold text-3xl sm:text-5xl uppercase tracking-tight">
               MEET THE BUILDERS
             </h2>
           </div>
 
-          <p className="font-sans font-medium text-sm sm:text-base text-white bg-black px-6 py-2.5 rounded-md border-2 border-black shadow-[4px_4px_0px_#000000]">
+          <p className="font-sans font-normal text-base sm:text-lg text-white max-w-2xl text-center leading-relaxed drop-shadow-sm pt-2">
             The hackathon leads, organizers, judges, and technical mentors building the arena.
           </p>
         </div>
 
-        {/* Neo-Brutalist Filter Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 mb-16">
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-16">
           {['all', 'lead', 'organizer', 'mentor', 'judge', 'speaker'].map((cat) => (
             <button
               key={cat}
               onClick={() => setFilter(cat)}
-              className={`px-5 py-2.5 rounded font-mono text-xs uppercase font-black tracking-wider transition-all border-2 border-black ${
+              className={`px-4 py-2 rounded-md font-sans text-xs font-semibold capitalize tracking-wide transition-all border-2 border-black ${
                 filter === cat
-                  ? 'bg-[#00D9FF] text-black shadow-[4px_4px_0px_#000000] translate-x-0.5 translate-y-0.5'
-                  : 'bg-white text-black shadow-[4px_4px_0px_#000000] hover:bg-black hover:text-white'
+                  ? 'bg-yellow-300 text-black shadow-[3px_3px_0px_#000000]'
+                  : 'bg-white text-black shadow-[2px_2px_0px_#000000] hover:bg-black hover:text-white'
               }`}
             >
-              {cat === 'all' ? (
-                <span className="inline-flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 fill-black text-black" />
-                  <span>ALL PROFILES</span>
-                </span>
-              ) : (
-                cat
-              )}
+              {cat === 'all' ? 'All Builders' : cat}
             </button>
           ))}
         </div>
 
-        {/* Digital Trading Cards Grid with Avatar Photos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        {/* Builder Profile Cards Grid with Photos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProfiles.map((builder, idx) => (
             <motion.div
               key={builder.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className="bg-white text-black border-3 border-black rounded-md p-6 relative flex flex-col items-center text-center shadow-[8px_8px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[3px_3px_0px_#000000] transition-all group overflow-visible"
+              transition={{ duration: 0.4, delay: idx * 0.08 }}
+              className="bg-white text-black border-3 border-black rounded-lg p-6 relative flex flex-col items-center text-center shadow-[6px_6px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[3px_3px_0px_#000000] transition-all group overflow-hidden"
               data-cursor={builder.name}
             >
-              {/* TOP TAPED BADGE PILL ("Meet") */}
-              <div className="relative mb-6 -mt-3">
-                <div className="tape-corner-tl" />
-                <div className="tape-corner-tr" />
-
-                <div className="bg-black text-white border-2 border-black px-8 py-1.5 rounded-full shadow-[3px_3px_0px_#000000]">
-                  <span className="font-display font-black text-xl tracking-wide">
-                    Meet
-                  </span>
-                </div>
+              {/* Badge Tag Header */}
+              <div className="w-full flex items-center justify-between mb-5 border-b-2 border-black pb-3">
+                <span className="font-sans text-xs font-medium text-gray-800 bg-gray-100 px-2.5 py-0.5 rounded border border-gray-300">
+                  {builder.organization || 'OOU Tech Community'}
+                </span>
+                <span className="font-sans text-xs font-bold text-white bg-black px-2.5 py-0.5 rounded uppercase tracking-wider">
+                  {builder.badge || 'Lead'}
+                </span>
               </div>
 
-              {/* PROFILE IMAGE CONTAINER WITH HARD BLACK BORDER & FLAT CYAN CURSOR */}
-              <div className="relative w-full max-w-[240px] aspect-square rounded border-3 border-black shadow-[5px_5px_0px_#000000] mb-6 bg-black overflow-hidden group-hover:scale-102 transition-transform">
+              {/* PROFILE IMAGE CONTAINER */}
+              <div className="relative w-full max-w-[200px] aspect-square rounded-lg border-3 border-black shadow-[4px_4px_0px_#000000] mb-5 bg-gray-100 overflow-hidden group-hover:scale-[1.02] transition-transform">
                 <img
                   src={builder.avatarUrl}
                   alt={builder.name}
-                  className="w-full h-full object-cover object-center grayscale group-hover:grayscale-0 transition-all duration-500"
+                  className="w-full h-full object-cover object-center transition-all duration-300"
                 />
-                
-                <span className="absolute bottom-2 left-2 font-mono text-[10px] font-black text-black bg-[#00D9FF] px-2 py-0.5 rounded border border-black uppercase shadow-[2px_2px_0px_#000000]">
-                  OTC BUILDER
-                </span>
-
-                {/* Flat Solid Cyan Cursor Pointer */}
-                <div className="absolute bottom-2 right-2 w-8 h-8 pointer-events-none z-20">
-                  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 3L25 15L15 17L10 27L5 3Z" fill="#00D9FF" stroke="#000000" strokeWidth="2.5" strokeLinejoin="miter" />
-                  </svg>
-                </div>
               </div>
 
-              {/* BOTTOM TAPED BADGE PILL ("The Team") */}
-              <div className="relative mb-5">
-                <div className="tape-corner-bl" />
-                <div className="tape-corner-br" />
-
-                <div className="bg-black text-white border-2 border-black px-8 py-1.5 rounded-full shadow-[3px_3px_0px_#000000]">
-                  <span className="font-display font-black text-xl tracking-wide">
-                    The <span className="text-[#00D9FF]">Team</span>
+              {/* BUILDER NAME & ROLE */}
+              <div className="space-y-2 mb-3 w-full">
+                <h3 className="font-display font-extrabold text-xl text-black tracking-tight">
+                  {builder.name}
+                </h3>
+                <div>
+                  <span className="font-sans text-xs font-bold text-black bg-yellow-300 px-3 py-1 rounded-md border-2 border-black inline-block shadow-[2px_2px_0px_#000000]">
+                    {builder.role}
                   </span>
                 </div>
               </div>
 
-              {/* BUILDER NAME & ROLE */}
-              <div className="space-y-1.5 mb-4">
-                <h3 className="font-display font-extrabold text-xl text-black tracking-tight">
-                  {builder.name}
-                </h3>
-                <p className="font-mono text-xs font-black text-black bg-[#00D9FF] px-3 py-1 rounded border border-black uppercase inline-block shadow-[2px_2px_0px_#000000]">
-                  {builder.role}
-                </p>
-                {builder.organization && (
-                  <p className="text-[11px] font-sans font-normal text-gray-700 mt-1">
-                    {builder.organization}
-                  </p>
-                )}
-              </div>
-
               {/* Bio */}
-              <p className="text-gray-800 text-xs font-sans font-normal leading-relaxed line-clamp-3 mb-4 px-2">
-                "{builder.bio}"
+              <p className="text-gray-700 text-xs sm:text-sm font-sans font-normal leading-relaxed mb-4 px-1 line-clamp-3">
+                {builder.bio}
               </p>
 
-              {/* Bottom Cyan Line Accent */}
-              <div className="w-full h-1.5 bg-black rounded-full mt-auto" />
+              {/* Skills Tags */}
+              {builder.skills && builder.skills.length > 0 && (
+                <div className="flex flex-wrap items-center justify-center gap-1.5 mt-auto pt-3 border-t border-gray-200 w-full">
+                  {builder.skills.map((skill, sIdx) => (
+                    <span
+                      key={sIdx}
+                      className="text-xs font-sans font-medium text-gray-700 bg-gray-100 px-2.5 py-1 rounded border border-gray-200"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
             </motion.div>
           ))}
         </div>

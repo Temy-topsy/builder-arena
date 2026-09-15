@@ -24,21 +24,21 @@ export const TrackModal: React.FC<TrackModalProps> = ({ track, onClose }) => {
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 p-2 rounded bg-black text-white hover:bg-[#00D9FF] hover:text-black border-2 border-black transition-colors"
+            className="absolute top-5 right-5 p-2 rounded bg-black text-white hover:bg-gray-800 border-2 border-black transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
 
           {/* Modal Header */}
           <div className="flex items-center gap-4 mb-6 border-b-3 border-black pb-4">
-            <div className="w-14 h-14 rounded bg-[#00D9FF] border-2 border-black flex items-center justify-center">
-              <track.icon className="w-8 h-8 text-black stroke-[2.5]" />
+            <div className="w-13 h-13 rounded-md bg-black text-white border-2 border-black flex items-center justify-center shadow-[3px_3px_0px_#000000] p-2.5 shrink-0">
+              <track.icon className="w-7 h-7 text-white stroke-[2]" />
             </div>
             <div>
               <span className="neo-tag">
                 CHALLENGE TRACK
               </span>
-              <h3 className="font-display font-black text-3xl uppercase mt-1">{track.name}</h3>
+              <h3 className="font-display font-black text-2xl sm:text-3xl uppercase mt-1">{track.name}</h3>
             </div>
           </div>
 
@@ -49,7 +49,7 @@ export const TrackModal: React.FC<TrackModalProps> = ({ track, onClose }) => {
           {/* Build Around List */}
           <div className="mb-6">
             <h4 className="font-mono text-xs font-black text-black uppercase mb-3 flex items-center gap-1.5">
-              <CheckCircle className="w-4 h-4 text-[#00D9FF]" />
+              <CheckCircle className="w-4 h-4 text-black" />
               FOCUS AREAS
             </h4>
             <div className="flex flex-wrap gap-2">
@@ -88,7 +88,7 @@ export const TrackModal: React.FC<TrackModalProps> = ({ track, onClose }) => {
             </h4>
             <div className="flex flex-wrap gap-2">
               {track.recommendedTools.map((tool, idx) => (
-                <span key={idx} className="px-2.5 py-1 rounded bg-[#00D9FF] text-black font-mono text-xs font-extrabold border border-black">
+                <span key={idx} className="px-2.5 py-1 rounded bg-yellow-300 text-black font-mono text-xs font-bold border border-black shadow-[2px_2px_0px_#000000]">
                   {tool}
                 </span>
               ))}

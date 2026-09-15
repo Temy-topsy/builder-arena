@@ -25,14 +25,18 @@ export const AboutOTCSection: React.FC = () => {
             className="lg:col-span-6 space-y-6"
           >
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded bg-white text-black border-3 border-black flex items-center justify-center font-display font-black text-xl shadow-[4px_4px_0px_#000000]">
-                OTC
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-md bg-white border-3 border-black flex items-center justify-center p-1.5 shadow-[4px_4px_0px_#000000] shrink-0 overflow-hidden">
+                <img
+                  src="/otc-logo.jpg"
+                  alt="OOU Tech Community Logo"
+                  className="w-full h-full object-contain rounded"
+                />
               </div>
               <div>
                 <span className="neo-tag">
                   ORGANIZER PROFILE
                 </span>
-                <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-white uppercase mt-1">
+                <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white uppercase mt-1 tracking-tight">
                   OOU TECH COMMUNITY (OTC)
                 </h2>
               </div>
@@ -40,7 +44,7 @@ export const AboutOTCSection: React.FC = () => {
 
             <div className="bg-white text-black border-3 border-black p-6 rounded-md shadow-[6px_6px_0px_#000000] space-y-4">
               <p className="font-sans font-medium text-base sm:text-lg leading-relaxed">
-                A university technology community bridging the gap between <strong className="underline">academic learning</strong> and <strong className="text-black bg-[#00D9FF] px-1.5 py-0.5 rounded">industry execution</strong>.
+                A university technology community bridging the gap between <strong className="underline">academic learning</strong> and <strong className="text-black bg-yellow-300 px-1.5 py-0.5 rounded">industry execution</strong>.
               </p>
               <p className="font-sans font-normal text-xs sm:text-sm text-gray-800 leading-relaxed">
                 OTC empowers hundreds of student developers, designers, and tech innovators at Olabisi Onabanjo University with hands-on bootcamps, open-source mentorship, developer meetups, and high-impact hackathons.
@@ -53,9 +57,9 @@ export const AboutOTCSection: React.FC = () => {
                 return (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 px-3.5 py-1.5 rounded bg-black text-white border-2 border-black font-mono text-xs font-black shadow-[3px_3px_0px_#000000]"
+                    className="flex items-center gap-2 px-3.5 py-1.5 rounded bg-black text-white border-2 border-black font-mono text-xs font-bold shadow-[3px_3px_0px_#000000]"
                   >
-                    <Icon className="w-3.5 h-3.5 text-[#00D9FF]" />
+                    <Icon className="w-3.5 h-3.5 text-white" />
                     <span>{pill.label}</span>
                   </div>
                 );

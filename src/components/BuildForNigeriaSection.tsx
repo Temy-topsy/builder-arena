@@ -1,11 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { NIGERIAN_PROBLEMS } from '../data/hackathonData';
-import { Flag, ArrowDown } from 'lucide-react';
+import { Target, ArrowDown } from 'lucide-react';
 
 export const BuildForNigeriaSection: React.FC = () => {
   return (
-    <section className="py-24 relative bg-neo-hero border-t-3 border-black overflow-hidden">
+    <section className="py-28 sm:py-36 relative bg-neo-hero border-t-3 border-black overflow-hidden">
       
       {/* Background Tech Image Overlay */}
       <img
@@ -16,25 +16,24 @@ export const BuildForNigeriaSection: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Header with Eyebrow Tag & Neo-Brutalist Title Box */}
-        <div className="text-center max-w-4xl mx-auto mb-16 flex flex-col items-center gap-4">
-          <span className="neo-tag flex items-center gap-1.5">
-            <Flag className="w-3.5 h-3.5 fill-white" />
-            <span>NIGERIAN PROBLEM MATRIX</span>
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20 flex flex-col items-center gap-4">
+          <span className="neo-tag">
+            NIGERIAN PROBLEM MATRIX
           </span>
 
-          <div className="inline-block bg-white text-black border-3 border-black px-8 sm:px-12 py-4 rounded-md shadow-[8px_8px_0px_#000000]">
-            <h2 className="font-display font-extrabold text-4xl sm:text-7xl uppercase tracking-tight">
-              BUILD FOR <span className="text-black underline decoration-[#00D9FF] decoration-4">NIGERIA</span>
+          <div className="inline-block bg-white text-black border-3 border-black px-6 sm:px-10 py-3 sm:py-4 rounded-md shadow-[6px_6px_0px_#000000]">
+            <h2 className="font-display font-extrabold text-3xl sm:text-6xl uppercase tracking-tight">
+              BUILD FOR <span className="text-black underline decoration-yellow-400 decoration-4">NIGERIA</span>
             </h2>
           </div>
 
-          <div className="bg-black text-white border-2 border-black px-6 py-2.5 rounded-md shadow-[4px_4px_0px_#000000] font-mono text-xs sm:text-sm font-bold uppercase tracking-wider">
-            Solve real problems • Build real products • Create real impact
-          </div>
+          <p className="font-sans font-normal text-base sm:text-lg text-white max-w-2xl text-center leading-relaxed drop-shadow-sm pt-2">
+            Solve real problems. Build real products. Create real impact.
+          </p>
         </div>
 
-        {/* Animated Nigerian Problem Statement Neo-Brutalist Cards */}
+        {/* Animated Nigerian Problem Statement Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-16">
           {NIGERIAN_PROBLEMS.map((problem, idx) => (
             <motion.div
@@ -42,16 +41,16 @@ export const BuildForNigeriaSection: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className="bg-white text-black border-3 border-black p-6 rounded-md shadow-[6px_6px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#000000] transition-all flex items-start gap-4 group"
+              transition={{ duration: 0.4, delay: idx * 0.08 }}
+              className="bg-white text-black border-3 border-black p-6 rounded-lg shadow-[6px_6px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[3px_3px_0px_#000000] transition-all flex items-start gap-4 group"
               data-cursor="PROBLEM"
             >
-              <div className="w-12 h-12 rounded bg-[#00D9FF] text-black border-2 border-black flex items-center justify-center font-mono text-xl font-black shrink-0 shadow-[3px_3px_0px_#000000]">
-                ?
+              <div className="w-11 h-11 rounded-md bg-yellow-300 text-black border-2 border-black flex items-center justify-center shrink-0 shadow-[2px_2px_0px_#000000]">
+                <Target className="w-5 h-5 text-black stroke-[2.5]" />
               </div>
               <div className="space-y-1.5">
-                <span className="neo-tag bg-black text-white text-[10px]">
-                  CHALLENGE #{idx + 1}
+                <span className="font-sans text-[11px] font-bold text-gray-700 uppercase tracking-wider block">
+                  CHALLENGE 0{idx + 1}
                 </span>
                 <p className="font-sans text-base sm:text-lg font-medium text-black leading-snug">
                   "{problem}"

@@ -346,9 +346,11 @@ export const AdminPage: React.FC = () => {
           className="w-full max-w-md bg-white text-black border-3 border-black rounded-md p-8 shadow-[10px_10px_0px_#000000] space-y-6"
         >
           <div className="flex items-center gap-3 border-b-3 border-black pb-4">
-            <div className="w-12 h-12 rounded bg-[#00D9FF] border-2 border-black flex items-center justify-center shadow-[3px_3px_0px_#000000]">
-              <Shield className="w-6 h-6 text-black" />
-            </div>
+            <img
+              src="/otc-logo.jpg"
+              alt="OTC Logo"
+              className="w-12 h-12 rounded-md object-contain border-2 border-black shadow-[3px_3px_0px_#000000] bg-white"
+            />
             <div>
               <span className="neo-tag text-[10px]">SECURITY CHECKPOINT</span>
               <h1 className="font-display font-black text-2xl uppercase mt-0.5">ADMIN CONSOLE</h1>
@@ -416,8 +418,10 @@ export const AdminPage: React.FC = () => {
             <Link to="/" className="text-white hover:text-[#00D9FF] flex items-center gap-1.5 font-mono text-xs font-bold mr-2">
               <ArrowLeft className="w-4 h-4" /> SITE
             </Link>
-            <div className="bg-white text-black font-display font-black px-3 py-1 rounded border-2 border-black text-xs uppercase shadow-[2px_2px_0px_#000000]">
-              BUILDERS ARENA <span className="bg-[#00D9FF] px-1 rounded ml-1">ADMIN</span>
+            <div className="bg-white text-black font-display font-black px-2.5 py-1 rounded border-2 border-black text-xs uppercase shadow-[2px_2px_0px_#000000] flex items-center gap-2">
+              <img src="/otc-logo.jpg" alt="OTC" className="w-5 h-5 rounded object-contain" />
+              <span>BUILDERS ARENA</span>
+              <span className="bg-black text-white px-1.5 py-0.5 rounded text-[10px]">ADMIN</span>
             </div>
           </div>
 
