@@ -5,6 +5,7 @@ import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { CustomCursor } from '../components/CustomCursor';
 import { Crown, ArrowLeft, ArrowRight, Building, Mail, Phone, Globe, CheckCircle2, ShieldCheck, DollarSign, AlertTriangle } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface SponsorFormData {
   companyName: string;
@@ -81,12 +82,46 @@ export const SponsorApplyPage: React.FC = () => {
       const randNum = Math.floor(1000 + Math.random() * 9000);
       const proposalId = `BA2026-SPONSOR-${randNum}`;
 
-      setProposalRecord({
-        proposal_id: proposalId,
-        ...formData,
-        status: 'inquiry_sent',
-      });
+      // 1. Save to Supabase backend
+      let savedProposal = null;
+      try {
+        const { data: dbProposal, error: dbError } = await supabase
+          .from('sponsor_applications')
+          .insert([
+            {
+              proposal_id: proposalId,
+              company_name: formData.companyName,
+              tier: formData.tier,
+              contact_name: formData.contactName,
+              contact_email: formData.contactEmail,
+              contact_phone: formData.contactPhone,
+              company_website: formData.companyWebsite || '',
+              industry: formData.industry || 'Fintech',
+              sponsorship_goals: formData.notes || '',
+              participation_types: formData.contributionType || [],
+              custom_requests: formData.notes || '',
+              status: 'under_review',
+            },
+          ])
+          .select()
+          .single();
 
+        if (!dbError && dbProposal) {
+          savedProposal = dbProposal;
+        }
+      } catch (dbErr) {
+        console.warn('Supabase sponsor save skipped or policy pending:', dbErr);
+      }
+
+      setProposalRecord(
+        savedProposal || {
+          proposal_id: proposalId,
+          ...formData,
+          status: 'under_review',
+        }
+      );
+
+      // 2. Trigger mailto client
       const mailtoUrl = generateMailtoUrl();
       window.location.href = mailtoUrl;
 

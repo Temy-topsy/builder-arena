@@ -14,7 +14,7 @@ export const AboutOTCSection: React.FC = () => {
     <section className="py-24 relative bg-neo-hero border-t-3 border-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
+
           {/* Left Column: OTC Narrative */}
           <div className="lg:col-span-6 space-y-6">
             <div className="flex items-center gap-4">
@@ -26,9 +26,6 @@ export const AboutOTCSection: React.FC = () => {
                 />
               </div>
               <div>
-                <span className="neo-tag">
-                  ORGANIZER PROFILE
-                </span>
                 <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white uppercase mt-1 tracking-tight">
                   OOU TECH COMMUNITY (OTC)
                 </h2>
@@ -63,7 +60,6 @@ export const AboutOTCSection: React.FC = () => {
           {/* Right Column: Achievements Box */}
           <div className="lg:col-span-6 bg-black text-white border-3 border-black rounded-md p-8 space-y-6 shadow-[8px_8px_0px_#000000]">
             <h3 className="font-display font-black text-xl text-[#00D9FF] uppercase flex items-center gap-2 border-b-2 border-white/30 pb-3">
-              <Zap className="w-5 h-5 text-[#00D9FF]" />
               COMMUNITY IMPACT HIGHLIGHTS
             </h3>
 

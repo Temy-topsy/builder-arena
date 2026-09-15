@@ -203,7 +203,7 @@ export const BUILDER_PROFILES: BuilderProfile[] = [
   },
   {
     id: 'usman-joseph',
-    name: 'Usman Joseph',
+    name: 'Joseph',
     role: 'Visual Experience Lead',
     category: 'lead',
     organization: 'OOU Tech Community',
@@ -214,7 +214,7 @@ export const BUILDER_PROFILES: BuilderProfile[] = [
   },
   {
     id: 'sanusi-quadri',
-    name: 'Sanusi Quadri',
+    name: 'Quadri Sanusi',
     role: 'Partnership Lead',
     category: 'lead',
     organization: 'OOU Tech Community',
@@ -233,6 +233,17 @@ export const BUILDER_PROFILES: BuilderProfile[] = [
     avatarUrl: '/team-haneefah-adegunle.jpg',
     skills: ['Volunteer Coordination', 'Event Logistics', 'Community Support'],
     badge: 'VOLUNTEERS LEAD',
+  },
+  {
+    id: 'faidat-odeyinka',
+    name: 'Faidat Odeyinka',
+    role: 'Asst. Visual Experience Lead',
+    category: 'lead',
+    organization: 'OOU Tech Community',
+    bio: 'Assisting brand identity design, visual content, and physical & digital assets creation for Builders Arena 2026.',
+    avatarUrl: '/faidat-odeyinka.jpg',
+    skills: ['Visual Design', 'Brand Identity', 'UI/UX', 'Creative Execution'],
+    badge: 'ASST. VISUAL LEAD',
   },
 ];
 
