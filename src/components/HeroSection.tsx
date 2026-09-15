@@ -66,7 +66,7 @@ export const HeroSection: React.FC = () => {
             to="/sponsors"
             className="w-full sm:w-auto px-8 py-3.5 bg-white text-black rounded-md border-2 border-black font-sans font-bold text-sm shadow-[4px_4px_0px_#000000] hover:bg-gray-100 hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#000000] transition-all flex items-center justify-center gap-2"
           >
-            <span>Sponsorship Deck</span>
+            <span>Partner With Us</span>
           </Link>
         </div>
 

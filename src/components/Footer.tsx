@@ -141,7 +141,6 @@ export const Footer: React.FC = () => {
             onClick={scrollToTop}
             className="shrink-0 flex items-center gap-1.5 bg-white text-black px-3.5 py-1.5 rounded font-mono text-xs font-bold border border-black shadow-[2px_2px_0px_#000000] hover:bg-yellow-300 transition-colors"
           >
-            <span>TOP</span>
             <ArrowUp className="w-3.5 h-3.5 stroke-[2.5]" />
           </button>
         </div>

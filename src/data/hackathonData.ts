@@ -375,7 +375,7 @@ export const FAQS = [
   },
   {
     q: 'What does participation cost?',
-    a: 'Participation is 100% FREE for all selected finalist teams! Meals, snacks, high-speed Wi-Fi, workspace, and swag are provided.',
+    a: 'Participation is 100% FREE for all selected finalist teams! Snacks, high-speed Wi-Fi, workspace, and swag are provided.',
   },
   {
     q: 'What support will sponsors receive?',

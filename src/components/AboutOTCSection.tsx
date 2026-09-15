@@ -1,15 +1,6 @@
 import React from 'react';
-import { Terminal, Users, Code, Award, Globe } from 'lucide-react';
 
 export const AboutOTCSection: React.FC = () => {
-  const otcPills = [
-    { label: 'COMMUNITY', icon: Users },
-    { label: 'WORKSHOPS', icon: Code },
-    { label: 'CONFERENCES', icon: Globe },
-    { label: 'HACKATHONS', icon: Award },
-    { label: 'BUILDERS', icon: Terminal },
-  ];
-
   return (
     <section className="py-24 relative bg-neo-hero border-t-3 border-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -40,21 +31,6 @@ export const AboutOTCSection: React.FC = () => {
                 OTC empowers hundreds of student developers, designers, and tech innovators at Olabisi Onabanjo University with hands-on bootcamps, open-source mentorship, developer meetups, and high-impact hackathons.
               </p>
             </div>
-
-            <div className="flex flex-wrap gap-2 pt-2">
-              {otcPills.map((pill, idx) => {
-                const Icon = pill.icon;
-                return (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2 px-3.5 py-1.5 rounded bg-black text-white border-2 border-black font-mono text-xs font-bold shadow-[3px_3px_0px_#000000]"
-                  >
-                    <Icon className="w-3.5 h-3.5 text-white" />
-                    <span>{pill.label}</span>
-                  </div>
-                );
-              })}
-            </div>
           </div>
 
           {/* Right Column: Achievements Box */}
@@ -65,7 +41,7 @@ export const AboutOTCSection: React.FC = () => {
 
             <div className="space-y-4 font-sans text-sm">
               <div className="p-4 rounded bg-white text-black border-2 border-black shadow-[4px_4px_0px_#000000] flex items-start gap-3">
-                <span className="bg-black text-[#00D9FF] font-mono font-black text-xs px-2 py-1 rounded">01</span>
+                <span className="bg-black text-[#00D9FF] font-sans font-black text-xs px-2 py-1 rounded">01</span>
                 <div>
                   <strong className="text-black block font-display font-black">500+ Student Developers Trained</strong>
                   <span className="text-gray-700 text-xs font-normal">Active bootcamps across Web Development, Mobile Dev, UI/UX, and AI tooling.</span>
@@ -73,7 +49,7 @@ export const AboutOTCSection: React.FC = () => {
               </div>
 
               <div className="p-4 rounded bg-white text-black border-2 border-black shadow-[4px_4px_0px_#000000] flex items-start gap-3">
-                <span className="bg-black text-[#00D9FF] font-mono font-black text-xs px-2 py-1 rounded">02</span>
+                <span className="bg-black text-[#00D9FF] font-sans font-black text-xs px-2 py-1 rounded">02</span>
                 <div>
                   <strong className="text-black block font-display font-black">Annual Flagship Tech Summit</strong>
                   <span className="text-gray-700 text-xs font-normal">Gathering 1,000+ students, industry founders, and tech executives yearly on campus.</span>
@@ -81,7 +57,7 @@ export const AboutOTCSection: React.FC = () => {
               </div>
 
               <div className="p-4 rounded bg-white text-black border-2 border-black shadow-[4px_4px_0px_#000000] flex items-start gap-3">
-                <span className="bg-black text-[#00D9FF] font-mono font-black text-xs px-2 py-1 rounded">03</span>
+                <span className="bg-black text-[#00D9FF] font-sans font-black text-xs px-2 py-1 rounded">03</span>
                 <div>
                   <strong className="text-black block font-display font-black">Startup & Project Incubation</strong>
                   <span className="text-gray-700 text-xs font-normal">Guiding student projects into registered tech ventures and internships.</span>
