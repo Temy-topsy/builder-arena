@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { CustomCursor } from '../components/CustomCursor';
-import { Zap, Plus, Trash2, ArrowRight, ArrowLeft, CheckCircle2, Check, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, ArrowRight, ArrowLeft, CheckCircle2, Check, AlertTriangle } from 'lucide-react';
 import { RegistrationFormData } from '../types';
 import { supabase } from '../lib/supabase';
 
@@ -467,7 +467,6 @@ export const RegisterPage: React.FC = () => {
                 loading ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >
-              <Zap className="w-5 h-5 text-black fill-black" />
               <span>{loading ? 'SUBMITTING APPLICATION...' : 'SUBMIT HACKATHON APPLICATION'}</span>
               <ArrowRight className="w-5 h-5" />
             </button>

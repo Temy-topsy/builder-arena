@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BUILDER_PROFILES } from '../data/hackathonData';
-import { Sparkles, Zap } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 export const BuildersSection: React.FC = () => {
   const [filter, setFilter] = useState<string>('all');

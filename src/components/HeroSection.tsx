@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Calendar, ArrowRight, Zap, Star } from 'lucide-react';
+import { MapPin, Calendar, ArrowRight, Star } from 'lucide-react';
 
 export const HeroSection: React.FC = () => {
   return (

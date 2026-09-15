@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TRACKS_DATA } from '../data/hackathonData';
 import { Track } from '../types';
 import { TrackModal } from './TrackModal';
-import { ArrowRight, Zap } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export const TracksSection: React.FC = () => {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
@@ -86,7 +86,6 @@ export const TracksSection: React.FC = () => {
                   className="w-full neo-btn-primary py-3.5 px-6 text-xs font-display uppercase tracking-wider flex items-center justify-between"
                 >
                   <span className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 fill-black" />
                     {track.ctaText}
                   </span>
                   <ArrowRight className="w-4 h-4" />

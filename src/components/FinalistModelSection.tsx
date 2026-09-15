@@ -44,12 +44,6 @@ export const FinalistModelSection: React.FC = () => {
 
         {/* Criteria Callouts (Clean & Without Icons) */}
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <div className="neo-tag bg-black text-white px-5 py-2.5 tracking-wider">
-            MAXIMUM 5 BUILDERS PER TEAM
-          </div>
-          <div className="neo-tag-accent px-5 py-2.5 tracking-wider font-bold">
-            SELECTED VIA COMPETITIVE SCREENING
-          </div>
         </div>
 
       </div>

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Terminal, Users, Code, Award, Zap } from 'lucide-react';
+import { Terminal, Users, Code, Award, Globe } from 'lucide-react';
 
 export const AboutOTCSection: React.FC = () => {
   const otcPills = [
     { label: 'COMMUNITY', icon: Users },
     { label: 'WORKSHOPS', icon: Code },
-    { label: 'CONFERENCES', icon: Zap },
+    { label: 'CONFERENCES', icon: Globe },
     { label: 'HACKATHONS', icon: Award },
     { label: 'BUILDERS', icon: Terminal },
   ];

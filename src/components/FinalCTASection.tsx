@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, ArrowRight, Users, Crown } from 'lucide-react';
+import { ArrowRight, Users, Crown } from 'lucide-react';
 
 export const FinalCTASection: React.FC = () => {
   return (

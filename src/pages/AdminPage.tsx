@@ -16,7 +16,6 @@ import {
   ExternalLink,
   Eye,
   RefreshCw,
-  Zap,
   ArrowLeft,
   X,
   Phone,
@@ -408,7 +407,6 @@ export const AdminPage: React.FC = () => {
                 loggingIn ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >
-              <Zap className="w-4 h-4 fill-black" />
               <span>{loggingIn ? 'VERIFYING CREDENTIALS...' : 'UNLOCK ADMIN CONSOLE'}</span>
             </button>
           </form>

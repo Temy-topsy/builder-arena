@@ -5,7 +5,7 @@ import { Footer } from '../components/Footer';
 import { CustomCursor } from '../components/CustomCursor';
 import { FinalistModelSection } from '../components/FinalistModelSection';
 import { supabase } from '../lib/supabase';
-import { Users, Zap, Shield, ArrowRight } from 'lucide-react';
+import { Users, Shield, ArrowRight } from 'lucide-react';
 
 interface ApprovedTeam {
   id: string | number;
@@ -124,7 +124,6 @@ export const TeamsPage: React.FC = () => {
                   to="/register"
                   className="inline-flex items-center gap-2 neo-btn-primary px-6 py-3 text-xs font-display uppercase tracking-wider"
                 >
-                  <Zap className="w-4 h-4 fill-black" />
                   <span>APPLY TO JOIN THE 15 TEAMS</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>

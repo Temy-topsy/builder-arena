@@ -1,5 +1,5 @@
 import { Track, TimelineStep, ScheduleDay, BuilderProfile, SponsorTier, FinalistTeam } from '../types';
-import { CreditCard, Sprout, Layers, Cpu, Wifi, Zap, Package, Video } from 'lucide-react';
+import { CreditCard, Sprout, Layers, Cpu, Wifi, BatteryCharging, Package, Video } from 'lucide-react';
 
 export const HERO_STATS = [
   { value: '15', label: 'FINALIST TEAMS', highlight: '#00D9FF' },
@@ -323,7 +323,7 @@ export const IN_KIND_PARTNERS = [
     color: '#00D9FF',
   },
   {
-    icon: Zap,
+    icon: BatteryCharging,
     title: 'ENERGY PARTNER',
     detail: 'Uninterrupted power supply & generator backup system for 48 continuous hours.',
     color: '#FFB800',
