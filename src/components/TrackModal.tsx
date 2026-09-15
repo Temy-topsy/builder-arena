@@ -48,7 +48,7 @@ export const TrackModal: React.FC<TrackModalProps> = ({ track, onClose }) => {
 
           {/* Build Around List */}
           <div className="mb-6">
-            <h4 className="font-mono text-xs font-black text-black uppercase mb-3 flex items-center gap-1.5">
+            <h4 className="font-sans text-sm font-black text-black uppercase mb-3 flex items-center gap-1.5">
               <CheckCircle className="w-4 h-4 text-black" />
               FOCUS AREAS
             </h4>
@@ -56,7 +56,7 @@ export const TrackModal: React.FC<TrackModalProps> = ({ track, onClose }) => {
               {track.buildAround.map((area, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1.5 rounded text-xs font-mono font-bold bg-black text-white border border-black shadow-[2px_2px_0px_#000000]"
+                  className="px-3.5 py-1.5 rounded text-sm font-sans font-bold bg-black text-white border border-black shadow-[2px_2px_0px_#000000]"
                 >
                   {area}
                 </span>
@@ -66,13 +66,12 @@ export const TrackModal: React.FC<TrackModalProps> = ({ track, onClose }) => {
 
           {/* Sample Problem Statements */}
           <div className="mb-6">
-            <h4 className="font-mono text-xs font-black text-black uppercase mb-3 flex items-center gap-1.5">
-              <Lightbulb className="w-4 h-4 text-black" />
+            <h4 className="font-sans text-sm font-black text-black uppercase mb-3 flex items-center gap-1.5">
               SAMPLE CHALLENGE BRIEFS
             </h4>
             <div className="space-y-2">
               {track.sampleProblems.map((problem, idx) => (
-                <div key={idx} className="p-3 rounded bg-gray-100 border-2 border-black text-black font-sans text-xs sm:text-sm font-normal shadow-[3px_3px_0px_#000000] flex items-start gap-2">
+                <div key={idx} className="p-3.5 rounded bg-gray-100 border-2 border-black text-black font-sans text-sm font-medium shadow-[3px_3px_0px_#000000] flex items-start gap-2">
                   <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                   <span>{problem}</span>
                 </div>
@@ -82,13 +81,12 @@ export const TrackModal: React.FC<TrackModalProps> = ({ track, onClose }) => {
 
           {/* Recommended Stacks */}
           <div className="mb-8">
-            <h4 className="font-mono text-xs font-black text-black uppercase mb-3 flex items-center gap-1.5">
-              <Wrench className="w-4 h-4 text-black" />
+            <h4 className="font-sans text-sm font-black text-black uppercase mb-3 flex items-center gap-1.5">
               RECOMMENDED STACK & APIS
             </h4>
             <div className="flex flex-wrap gap-2">
               {track.recommendedTools.map((tool, idx) => (
-                <span key={idx} className="px-2.5 py-1 rounded bg-yellow-300 text-black font-mono text-xs font-bold border border-black shadow-[2px_2px_0px_#000000]">
+                <span key={idx} className="px-3 py-1.5 rounded bg-yellow-300 text-black font-sans text-sm font-bold border border-black shadow-[2px_2px_0px_#000000]">
                   {tool}
                 </span>
               ))}
@@ -100,14 +98,14 @@ export const TrackModal: React.FC<TrackModalProps> = ({ track, onClose }) => {
             <Link
               to="/register"
               onClick={onClose}
-              className="flex-1 py-3 px-4 rounded neo-btn-primary text-center text-xs font-display uppercase tracking-wider flex items-center justify-center gap-2"
+              className="flex-1 py-3.5 px-5 rounded neo-btn-primary text-center text-xs sm:text-sm font-display uppercase tracking-wider flex items-center justify-center gap-2"
             >
               <span>REGISTER FOR THIS TRACK</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
             <button
               onClick={onClose}
-              className="py-3 px-4 rounded neo-btn-secondary text-xs font-mono uppercase font-bold"
+              className="py-3.5 px-5 rounded neo-btn-secondary text-xs sm:text-sm font-sans uppercase font-bold"
             >
               CLOSE PREVIEW
             </button>

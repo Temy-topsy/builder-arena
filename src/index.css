@@ -73,12 +73,12 @@
 .neo-tag {
   background-color: #000000;
   color: #FFFFFF;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 500;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border: 2px solid #000000;
   border-radius: 4px;
   box-shadow: 3px 3px 0px #000000;
@@ -87,12 +87,12 @@
 .neo-tag-accent {
   background-color: #00D9FF;
   color: #000000;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border: 2px solid #000000;
   border-radius: 4px;
   box-shadow: 3px 3px 0px #000000;
