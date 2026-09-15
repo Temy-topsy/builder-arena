@@ -40,7 +40,7 @@ export const FinalCTASection: React.FC = () => {
           </Link>
 
           <a
-            href="https://wa.me/2348061764593"
+            href="https://chat.whatsapp.com/Dl4Fmsim0e83P0hOzZqADs"
             target="_blank"
             rel="noreferrer"
             className="w-full sm:w-auto bg-black text-white hover:bg-white hover:text-black border-3 border-black font-sans text-xs uppercase font-extrabold px-6 py-4 rounded-md shadow-[5px_5px_0px_#000000] transition-all flex items-center justify-center gap-2"
