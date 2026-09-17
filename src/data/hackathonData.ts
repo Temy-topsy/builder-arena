@@ -203,7 +203,7 @@ export const BUILDER_PROFILES: BuilderProfile[] = [
   },
   {
     id: 'usman-joseph',
-    name: 'Joseph',
+    name: 'Joseph Usman',
     role: 'Visual Experience Lead',
     category: 'lead',
     organization: 'OOU Tech Community',

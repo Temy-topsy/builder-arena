@@ -27,11 +27,10 @@ export const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-200 ${
-        scrolled
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-200 ${scrolled
           ? 'bg-black text-white border-b-2 border-black py-2 shadow-md'
           : 'bg-transparent py-2.5 sm:py-3'
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Brand Logo - Clean, Compact OTC Logo */}
@@ -51,9 +50,8 @@ export const Navbar: React.FC = () => {
               <Link
                 key={item.label}
                 to={item.path}
-                className={`text-xs font-sans font-medium px-3 py-1 rounded transition-colors ${
-                  isActive ? 'bg-black text-white font-semibold' : 'text-gray-800 hover:text-black hover:bg-gray-100'
-                }`}
+                className={`text-xs font-sans font-medium px-3 py-1 rounded transition-colors ${isActive ? 'bg-black text-white font-semibold' : 'text-gray-800 hover:text-black hover:bg-gray-100'
+                  }`}
               >
                 {item.label}
               </Link>
@@ -71,7 +69,7 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             to="/register"
-            className="px-4 py-1.5 text-xs font-sans font-semibold rounded-md border-2 border-black bg-yellow-300 text-black hover:bg-yellow-400 transition-colors shadow-[2px_2px_0px_#000000] flex items-center gap-1.5"
+            className="px-4 py-1.5 text-xs font-sans font-semibold rounded-md border-2 border-black bg-blue-300 text-black hover:bg-yellow-400 transition-colors shadow-[2px_2px_0px_#000000] flex items-center gap-1.5"
           >
             <span>Register Team</span>
           </Link>

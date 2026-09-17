@@ -42,7 +42,7 @@ export const HeroSection: React.FC = () => {
           <br />
 
           {/* Line 3: Hackathon 2026 */}
-          <div className="inline-flex items-center gap-3 sm:gap-4 bg-yellow-300 text-black border-3 border-black rounded-md px-5 sm:px-10 py-2 sm:py-3 shadow-[6px_6px_0px_#000000]">
+          <div className="inline-flex items-center gap-3 sm:gap-4 bg-blue-300 text-black border-3 border-black rounded-md px-5 sm:px-10 py-2 sm:py-3 shadow-[6px_6px_0px_#000000]">
             <h1 className="font-display font-extrabold text-3xl sm:text-5xl md:text-7xl tracking-tight leading-none uppercase">
               Hackathon
             </h1>
@@ -56,7 +56,7 @@ export const HeroSection: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-lg">
           <Link
             to="/register"
-            className="w-full sm:w-auto px-8 py-3.5 bg-yellow-300 text-black rounded-md border-2 border-black font-sans font-bold text-sm shadow-[4px_4px_0px_#000000] hover:bg-yellow-400 hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#000000] transition-all flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-8 py-3.5 bg-blue-300 text-black rounded-md border-2 border-black font-sans font-bold text-sm shadow-[4px_4px_0px_#000000] hover:bg-blue-400 hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#000000] transition-all flex items-center justify-center gap-2"
           >
             <span>Register Your Team</span>
             <ArrowRight className="w-4 h-4" />
