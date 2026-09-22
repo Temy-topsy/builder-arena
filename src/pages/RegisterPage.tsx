@@ -1,18 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { CustomCursor } from '../components/CustomCursor';
-import { Plus, Trash2, ArrowRight, ArrowLeft, CheckCircle2, Check, AlertTriangle } from 'lucide-react';
+import {
+  Plus,
+  Trash2,
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  AlertTriangle,
+  Search,
+  Copy,
+  CheckCircle2,
+  Users,
+  ShieldAlert,
+  Printer,
+  Sparkles
+} from 'lucide-react';
 import { RegistrationFormData } from '../types';
 import { supabase } from '../lib/supabase';
 
+// Helper to normalize phone numbers (e.g. +234 806 176 4593 -> 8061764593)
+const normalizePhone = (phone: string) => {
+  if (!phone) return '';
+  const digits = phone.replace(/\D/g, '');
+  return digits.slice(-10);
+};
+
 export const RegisterPage: React.FC = () => {
+  const location = useLocation();
+
+  // Submission state
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [applicationRecord, setApplicationRecord] = useState<any>(null);
+
+  // Duplicate / Welcome Back state
+  const [isWelcomeBack, setIsWelcomeBack] = useState(false);
+  const [welcomeRecord, setWelcomeRecord] = useState<any>(null);
+  const [duplicateReason, setDuplicateReason] = useState<string | null>(null);
+  const [copiedAppId, setCopiedAppId] = useState(false);
+
+  // Search / Lookup state
+  const [showLookup, setShowLookup] = useState(false);
+  const [lookupQuery, setLookupQuery] = useState('');
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupError, setLookupError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<RegistrationFormData>({
     teamName: '',
@@ -30,6 +66,14 @@ export const RegisterPage: React.FC = () => {
     projectIdea: '',
     whySelected: '',
   });
+
+  // Check URL parameters for status lookup
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('lookup') === 'true' || location.pathname === '/status' || location.pathname === '/my-team') {
+      setShowLookup(true);
+    }
+  }, [location]);
 
   const handleAddMember = () => {
     if (formData.members.length < 4) {
@@ -61,12 +105,189 @@ export const RegisterPage: React.FC = () => {
     setFormData({ ...formData, members: updated });
   };
 
+  const copyApplicationId = (id: string) => {
+    navigator.clipboard.writeText(id);
+    setCopiedAppId(true);
+    setTimeout(() => setCopiedAppId(false), 2500);
+  };
+
+  // Lookup existing registration manually
+  const handleLookup = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const query = lookupQuery.trim();
+    if (!query) return;
+
+    setLookupLoading(true);
+    setLookupError(null);
+
+    try {
+      const qNorm = query.toLowerCase();
+      const qPhone = normalizePhone(query);
+
+      const { data: teams, error: searchError } = await supabase
+        .from('team_registrations')
+        .select('*');
+
+      if (searchError) throw searchError;
+
+      let found: any = null;
+      if (Array.isArray(teams)) {
+        for (const t of teams) {
+          const appId = (t.application_id || '').toLowerCase();
+          const teamName = (t.team_name || '').toLowerCase();
+          const leadEmail = (t.team_lead_email || '').toLowerCase();
+          const leadPhone = normalizePhone(t.team_lead_phone || '');
+          const members: Array<{ email?: string; name?: string }> = Array.isArray(t.members) ? t.members : [];
+
+          if (
+            appId === qNorm ||
+            teamName === qNorm ||
+            leadEmail === qNorm ||
+            (qPhone && leadPhone === qPhone) ||
+            members.some((m) => (m.email || '').toLowerCase() === qNorm)
+          ) {
+            found = t;
+            break;
+          }
+        }
+      }
+
+      if (found) {
+        setWelcomeRecord(found);
+        setDuplicateReason(null);
+        setIsWelcomeBack(true);
+        setShowLookup(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        setLookupError('No existing team registration found for that search. You can register your team below!');
+      }
+    } catch (err: any) {
+      console.error('Lookup error:', err);
+      setLookupError(err.message || 'Error looking up registration.');
+    } finally {
+      setLookupLoading(false);
+    }
+  };
+
+  // Main Form Submission with Duplicate Prevention
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
+      const leadEmailNorm = formData.teamLeadEmail.trim().toLowerCase();
+      const leadPhoneNorm = normalizePhone(formData.teamLeadPhone);
+      const teamNameNorm = formData.teamName.trim().toLowerCase();
+
+      // 1. In-Form Validations
+      const memberEmails = formData.members
+        .map((m) => m.email.trim().toLowerCase())
+        .filter((em) => em.length > 0);
+
+      // Check if lead email is also entered in members
+      if (memberEmails.includes(leadEmailNorm)) {
+        throw new Error(
+          'Team Lead email cannot be added as a team member. The team lead is already registered as Builder #1.'
+        );
+      }
+
+      // Check if there are duplicate member emails inside this form
+      const uniqueMemberEmails = new Set(memberEmails);
+      if (uniqueMemberEmails.size !== memberEmails.length) {
+        throw new Error(
+          'Duplicate member emails detected in your team list. Each builder must have a unique email address.'
+        );
+      }
+
+      // 2. Query Existing Registrations for Duplicate Checking
+      const { data: existingTeams, error: fetchErr } = await supabase
+        .from('team_registrations')
+        .select('*');
+
+      if (fetchErr) {
+        console.warn('Could not read existing registrations:', fetchErr.message);
+      }
+
+      if (Array.isArray(existingTeams) && existingTeams.length > 0) {
+        let matchedTeam: any = null;
+        let matchReason = '';
+
+        for (const t of existingTeams) {
+          const existingTeamName = (t.team_name || '').trim().toLowerCase();
+          const existingLeadEmail = (t.team_lead_email || '').trim().toLowerCase();
+          const existingLeadPhone = normalizePhone(t.team_lead_phone || '');
+          const existingMembers: Array<{ name?: string; email?: string }> = Array.isArray(t.members)
+            ? t.members
+            : [];
+
+          // 1) Match Team Name
+          if (existingTeamName === teamNameNorm) {
+            matchedTeam = t;
+            matchReason = `The team name "${t.team_name}" is already registered.`;
+            break;
+          }
+
+          // 2) Match Team Lead Email
+          if (existingLeadEmail === leadEmailNorm) {
+            matchedTeam = t;
+            matchReason = `The email ${formData.teamLeadEmail} is already registered as the Team Lead of team "${t.team_name}".`;
+            break;
+          }
+
+          // 3) Match Team Lead Phone
+          if (leadPhoneNorm && existingLeadPhone && leadPhoneNorm === existingLeadPhone) {
+            matchedTeam = t;
+            matchReason = `The phone number ${formData.teamLeadPhone} is already registered with team "${t.team_name}".`;
+            break;
+          }
+
+          // 4) Check if Team Lead email is already in an existing team's members list
+          const leadInExistingMembers = existingMembers.find(
+            (em) => (em.email || '').trim().toLowerCase() === leadEmailNorm
+          );
+          if (leadInExistingMembers) {
+            matchedTeam = t;
+            matchReason = `The email ${formData.teamLeadEmail} is already registered as a builder in team "${t.team_name}".`;
+            break;
+          }
+
+          // 5) Check if any new team member is already registered in an existing team (as lead or member)
+          for (const newM of formData.members) {
+            const mEmail = (newM.email || '').trim().toLowerCase();
+            if (!mEmail) continue;
+
+            if (existingLeadEmail === mEmail) {
+              matchedTeam = t;
+              matchReason = `Builder ${newM.name || mEmail} is already registered as the Team Lead of team "${t.team_name}".`;
+              break;
+            }
+
+            const inExistingMembers = existingMembers.find(
+              (em) => (em.email || '').trim().toLowerCase() === mEmail
+            );
+            if (inExistingMembers) {
+              matchedTeam = t;
+              matchReason = `Builder ${newM.name || mEmail} is already registered in team "${t.team_name}".`;
+              break;
+            }
+          }
+
+          if (matchedTeam) break;
+        }
+
+        // DUPLICATE DETECTED: Block duplicate insert and show Welcome Back page
+        if (matchedTeam) {
+          setWelcomeRecord(matchedTeam);
+          setDuplicateReason(matchReason);
+          setIsWelcomeBack(true);
+          setLoading(false);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+      }
+
+      // 3. No Duplicate Found: Proceed with Insertion!
       const randNum = Math.floor(1000 + Math.random() * 9000);
       const applicationId = `BA2026-APP-${randNum}`;
 
@@ -75,11 +296,11 @@ export const RegisterPage: React.FC = () => {
         .insert([
           {
             application_id: applicationId,
-            team_name: formData.teamName,
+            team_name: formData.teamName.trim(),
             track: formData.track,
-            team_lead_name: formData.teamLeadName,
-            team_lead_email: formData.teamLeadEmail,
-            team_lead_phone: formData.teamLeadPhone,
+            team_lead_name: formData.teamLeadName.trim(),
+            team_lead_email: leadEmailNorm,
+            team_lead_phone: formData.teamLeadPhone.trim(),
             matric_number: formData.department,
             department_level: formData.university,
             members: formData.members,
@@ -112,39 +333,316 @@ export const RegisterPage: React.FC = () => {
       <Navbar />
 
       <main className="pt-36 pb-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
-        <div className="mb-12 space-y-4">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 neo-btn-secondary px-4 py-2 text-xs font-mono font-bold uppercase mb-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>RETURN TO HOME</span>
-          </Link>
+        {/* Navigation & Header */}
+        <div className="mb-10 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 neo-btn-secondary px-4 py-2 text-xs font-sans font-bold uppercase"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>RETURN TO HOME</span>
+            </Link>
+
+            {/* Quick Status Lookup Toggle Button */}
+            {!isWelcomeBack && !submitted && (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLookup(!showLookup);
+                  setLookupError(null);
+                }}
+                className="inline-flex items-center gap-2 bg-white text-black border-2 border-black px-4 py-2 rounded-md font-sans text-xs font-bold shadow-[3px_3px_0px_#000000] hover:bg-yellow-300 transition-colors"
+              >
+                <Search className="w-3.5 h-3.5" />
+                <span>{showLookup ? 'HIDE LOOKUP' : 'ALREADY REGISTERED? CHECK STATUS'}</span>
+              </button>
+            )}
+          </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="neo-tag">
-              BUILDERS ARENA 2026
-            </span>
-            <span className="neo-tag-accent">
-              48-HOUR SPRINT REGISTRATION
-            </span>
+            <span className="neo-tag">BUILDERS ARENA 2026</span>
+            <span className="neo-tag-accent">48-HOUR SPRINT REGISTRATION</span>
           </div>
 
           <div className="inline-block bg-white text-black border-3 border-black px-8 py-3 rounded-md shadow-[6px_6px_0px_#000000]">
-            <h1 className="font-display font-extrabold text-4xl sm:text-6xl uppercase tracking-tight">
-              REGISTER YOUR TEAM
+            <h1 className="font-display font-extrabold text-3xl sm:text-5xl uppercase tracking-tight">
+              {isWelcomeBack
+                ? 'WELCOME BACK, BUILDER!'
+                : submitted
+                ? 'APPLICATION RECEIVED!'
+                : 'REGISTER YOUR TEAM'}
             </h1>
           </div>
 
-          <p className="font-sans font-medium text-sm sm:text-base text-white bg-black px-6 py-2.5 rounded-md border-2 border-black shadow-[4px_4px_0px_#000000]">
-            Submit your team details and solution proposal for screening into the top 15 finalist cohort.
+          <p className="font-sans font-medium text-xs sm:text-sm text-white bg-black px-6 py-2.5 rounded-md border-2 border-black shadow-[4px_4px_0px_#000000]">
+            {isWelcomeBack
+              ? 'Our system verified your registration record. Below are your existing application details.'
+              : 'Submit your team details and solution proposal for screening into the top 15 finalist cohort.'}
           </p>
         </div>
 
-        {submitted ? (
-          /* NEO-BRUTALIST APPLICATION RECEIPT */
+        {/* Quick Lookup Bar */}
+        {showLookup && !isWelcomeBack && !submitted && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 p-6 bg-yellow-300 border-3 border-black rounded-md shadow-[6px_6px_0px_#000000] space-y-4"
+          >
+            <div className="flex items-center gap-2">
+              <Search className="w-5 h-5 text-black" />
+              <h3 className="font-display font-black text-sm uppercase">
+                LOOK UP YOUR EXISTING REGISTRATION
+              </h3>
+            </div>
+            <p className="text-xs font-sans text-gray-900">
+              Enter your <strong>Team Lead Email</strong>, <strong>Phone Number</strong>, or <strong>Application ID</strong> (e.g. BA2026-APP-1234) to view your team's application details and screening status.
+            </p>
+            <form onSubmit={handleLookup} className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                placeholder="e.g. temy@example.com or 08012345678"
+                value={lookupQuery}
+                onChange={(e) => setLookupQuery(e.target.value)}
+                className="flex-1 bg-white border-2 border-black rounded p-3 text-black font-sans text-xs font-semibold focus:shadow-[3px_3px_0px_#000000] focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={lookupLoading}
+                className="neo-btn-primary px-6 py-3 text-xs font-display uppercase tracking-wider flex items-center justify-center gap-2 shrink-0"
+              >
+                <span>{lookupLoading ? 'SEARCHING...' : 'FIND APPLICATION'}</span>
+              </button>
+            </form>
+            {lookupError && (
+              <div className="p-3 bg-red-100 border-2 border-black rounded text-red-800 font-sans text-xs flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
+                <span>{lookupError}</span>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* CASE 1: WELCOME BACK / ALREADY REGISTERED RECEIPT VIEW                    */}
+        {/* ========================================================================= */}
+        {isWelcomeBack && welcomeRecord ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="space-y-6"
+          >
+            {/* Duplicate Notice Banner (if triggered by a duplicate attempt) */}
+            {duplicateReason && (
+              <div className="p-5 rounded-md bg-amber-100 border-3 border-black text-black shadow-[6px_6px_0px_#000000] space-y-2">
+                <div className="flex items-center gap-2 text-amber-900 font-display font-black text-sm uppercase">
+                  <ShieldAlert className="w-5 h-5 text-amber-800" />
+                  <span>DUPLICATE SUBMISSION PREVENTED</span>
+                </div>
+                <p className="font-sans text-xs sm:text-sm text-amber-950 font-medium">
+                  {duplicateReason}
+                </p>
+                <p className="font-sans text-xs text-amber-800">
+                  To ensure equal opportunity and fair judging, each applicant is strictly limited to <strong>one team</strong> and <strong>one application</strong>. Your existing team record is already safely stored in our system below.
+                </p>
+              </div>
+            )}
+
+            {/* Application Card */}
+            <div className="bg-white text-black border-3 border-black rounded-md p-6 sm:p-10 shadow-[10px_10px_0px_#000000] space-y-8">
+              {/* Header inside card */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b-3 border-black pb-6">
+                <div>
+                  <span className="neo-tag mb-2 inline-block">REGISTERED APPLICATION</span>
+                  <h2 className="font-display font-black text-2xl sm:text-4xl uppercase tracking-tight text-black">
+                    {welcomeRecord.team_name}
+                  </h2>
+                  <p className="font-sans text-xs sm:text-sm text-gray-700 mt-1">
+                    Track:{' '}
+                    <strong className="text-black uppercase bg-[#00D9FF] px-2 py-0.5 rounded border border-black font-bold">
+                      {welcomeRecord.track} TRACK
+                    </strong>
+                  </p>
+                </div>
+
+                {/* Screening Status Badge */}
+                <div className="sm:text-right space-y-1">
+                  <span className="block font-sans text-[11px] font-bold uppercase text-gray-600">
+                    SCREENING STATUS
+                  </span>
+                  <span
+                    className={`inline-block px-3 py-1.5 rounded-md border-2 border-black font-sans text-xs font-black uppercase shadow-[3px_3px_0px_#000000] ${
+                      welcomeRecord.status === 'approved'
+                        ? 'bg-emerald-300 text-black'
+                        : welcomeRecord.status === 'rejected'
+                        ? 'bg-red-300 text-black'
+                        : 'bg-yellow-300 text-black'
+                    }`}
+                  >
+                    {welcomeRecord.status === 'approved'
+                      ? 'SELECTED FINALIST (TOP 15)'
+                      : welcomeRecord.status === 'rejected'
+                      ? 'NOT SELECTED'
+                      : 'UNDER REVIEW'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Application ID & Quick Copy */}
+              <div className="p-4 bg-gray-50 border-2 border-black rounded-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[4px_4px_0px_#000000]">
+                <div>
+                  <span className="font-sans text-[11px] text-gray-600 font-bold uppercase block">
+                    OFFICIAL APPLICATION ID
+                  </span>
+                  <span className="font-sans text-lg sm:text-xl font-black text-black">
+                    {welcomeRecord.application_id || 'BA2026-APP-ON-FILE'}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => copyApplicationId(welcomeRecord.application_id)}
+                  className="neo-btn-secondary px-4 py-2 text-xs font-sans font-bold flex items-center gap-1.5"
+                >
+                  {copiedAppId ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>COPIED!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>COPY ID</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Team Lead & University Details */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 border-2 border-black rounded-md bg-white shadow-[3px_3px_0px_#000000] space-y-2">
+                  <span className="font-sans text-[11px] text-gray-600 font-bold uppercase block">
+                    TEAM LEAD (BUILDER #1)
+                  </span>
+                  <div className="font-display font-black text-base text-black">
+                    {welcomeRecord.team_lead_name}
+                  </div>
+                  <div className="font-sans text-xs text-gray-800 space-y-1">
+                    <div>
+                      <strong>Email:</strong> {welcomeRecord.team_lead_email}
+                    </div>
+                    <div>
+                      <strong>Phone / WhatsApp:</strong> {welcomeRecord.team_lead_phone}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 border-2 border-black rounded-md bg-white shadow-[3px_3px_0px_#000000] space-y-2">
+                  <span className="font-sans text-[11px] text-gray-600 font-bold uppercase block">
+                    ACADEMIC INSTITUTION
+                  </span>
+                  <div className="font-display font-black text-base text-black">
+                    {welcomeRecord.department_level || 'Olabisi Onabanjo University'}
+                  </div>
+                  <div className="font-sans text-xs text-gray-800">
+                    <strong>Department / Level:</strong> {welcomeRecord.matric_number || 'N/A'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Team Members List */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-black" />
+                  <h4 className="font-display font-black text-sm uppercase">
+                    REGISTERED TEAM MEMBERS (
+                    {(Array.isArray(welcomeRecord.members) ? welcomeRecord.members.length : 0) + 1} TOTAL)
+                  </h4>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans text-xs">
+                  {/* Lead builder chip */}
+                  <div className="p-3 bg-yellow-100 border-2 border-black rounded shadow-[2px_2px_0px_#000000]">
+                    <div className="flex justify-between items-center mb-1">
+                      <strong className="text-black">{welcomeRecord.team_lead_name}</strong>
+                      <span className="bg-black text-white px-2 py-0.5 rounded text-[10px] font-bold">
+                        LEAD
+                      </span>
+                    </div>
+                    <span className="text-gray-700 text-[11px] block">{welcomeRecord.team_lead_email}</span>
+                  </div>
+
+                  {/* Additional members */}
+                  {Array.isArray(welcomeRecord.members) &&
+                    welcomeRecord.members.map((m: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="p-3 bg-gray-50 border-2 border-black rounded shadow-[2px_2px_0px_#000000]"
+                      >
+                        <div className="flex justify-between items-center mb-1">
+                          <strong className="text-black">{m.name || `Builder #${idx + 2}`}</strong>
+                          <span className="bg-[#00D9FF] text-black px-2 py-0.5 rounded text-[10px] font-bold border border-black">
+                            {m.role || 'Member'}
+                          </span>
+                        </div>
+                        <span className="text-gray-700 text-[11px] block">{m.email || 'No email provided'}</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Solution Proposal Preview */}
+              {welcomeRecord.problem_statement && (
+                <div className="p-4 rounded-md bg-gray-50 border-2 border-black space-y-2">
+                  <span className="font-sans text-[11px] text-gray-600 font-bold uppercase block">
+                    PROJECT PROPOSAL SUMMARY
+                  </span>
+                  <p className="font-sans text-xs text-gray-900 whitespace-pre-line leading-relaxed">
+                    {welcomeRecord.problem_statement}
+                  </p>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="pt-4 border-t-2 border-black flex flex-wrap gap-4 items-center justify-between">
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="neo-btn-secondary px-5 py-3 text-xs font-sans font-bold flex items-center gap-1.5"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>PRINT SLIP</span>
+                  </button>
+
+                  <a
+                    href="https://wa.me/2348061764593"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="neo-btn-primary px-5 py-3 text-xs font-sans font-bold flex items-center gap-1.5"
+                  >
+                    <span>JOIN OTC COMMUNITY</span>
+                  </a>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsWelcomeBack(false);
+                    setWelcomeRecord(null);
+                    setDuplicateReason(null);
+                    setShowLookup(false);
+                  }}
+                  className="text-xs font-sans font-bold underline hover:text-[#00D9FF] text-black"
+                >
+                  Look up another team or start new form →
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        ) : submitted ? (
+          /* ========================================================================= */
+          /* CASE 2: BRAND NEW REGISTRATION RECEIPT                                    */
+          /* ========================================================================= */
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -159,11 +657,16 @@ export const RegisterPage: React.FC = () => {
             </h2>
 
             <p className="font-sans font-normal text-base sm:text-lg text-gray-800 max-w-xl mx-auto leading-relaxed">
-              Thank you for applying to <strong className="text-black bg-[#00D9FF] px-1.5 py-0.5 rounded border border-black font-semibold">BUILDERS ARENA 2026</strong>. Your team <strong className="text-black underline font-semibold">{formData.teamName || 'Your Team'}</strong> is registered under the <strong className="text-black uppercase font-semibold">{formData.track}</strong> track.
+              Thank you for applying to{' '}
+              <strong className="text-black bg-[#00D9FF] px-1.5 py-0.5 rounded border border-black font-semibold">
+                BUILDERS ARENA 2026
+              </strong>
+              . Your team <strong className="text-black underline font-semibold">{formData.teamName || 'Your Team'}</strong> is registered under the{' '}
+              <strong className="text-black uppercase font-semibold">{formData.track}</strong> track.
             </p>
 
             {/* RECEIPT SLIP */}
-            <div className="p-6 rounded bg-gray-50 border-3 border-black text-left max-w-lg mx-auto font-mono text-xs space-y-3 shadow-[6px_6px_0px_#000000]">
+            <div className="p-6 rounded bg-gray-50 border-3 border-black text-left max-w-lg mx-auto font-sans text-xs space-y-3 shadow-[6px_6px_0px_#000000]">
               <div className="flex justify-between border-b-2 border-black pb-2">
                 <span className="text-gray-600 font-medium">APPLICATION ID:</span>
                 <span className="text-black font-bold bg-[#00D9FF] px-2 py-0.5 rounded border border-black">
@@ -187,7 +690,8 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             <p className="text-xs text-gray-700 font-sans font-normal">
-              Confirmation and screening updates will be sent to <strong className="text-black underline font-semibold">{formData.teamLeadEmail}</strong>.
+              Confirmation and screening updates will be sent to{' '}
+              <strong className="text-black underline font-semibold">{formData.teamLeadEmail}</strong>.
             </p>
 
             <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
@@ -198,23 +702,29 @@ export const RegisterPage: React.FC = () => {
                 RETURN HOME
               </Link>
               <button
-                onClick={() => setSubmitted(false)}
-                className="neo-btn-secondary px-8 py-3.5 text-xs font-mono uppercase font-bold"
+                type="button"
+                onClick={() => {
+                  setSubmitted(false);
+                  setIsWelcomeBack(false);
+                }}
+                className="neo-btn-secondary px-8 py-3.5 text-xs font-sans uppercase font-bold"
               >
-                SUBMIT ANOTHER APPLICATION
+                VIEW APPLICATION DETAILS
               </button>
             </div>
           </motion.div>
         ) : (
-          /* NEO-BRUTALIST REGISTRATION FORM */
+          /* ========================================================================= */
+          /* CASE 3: NEO-BRUTALIST REGISTRATION FORM                                   */
+          /* ========================================================================= */
           <form onSubmit={handleSubmit} className="space-y-8">
             {error && (
-              <div className="p-4 rounded bg-red-100 border-3 border-black text-red-800 font-mono text-xs shadow-[4px_4px_0px_#000000] flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-700 shrink-0" />
-                <span>{error}</span>
+              <div className="p-4 rounded bg-red-100 border-3 border-black text-red-800 font-sans text-xs shadow-[4px_4px_0px_#000000] flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-700 shrink-0" />
+                <span className="font-semibold">{error}</span>
               </div>
             )}
-            
+
             {/* Step 1: Team & Track Information */}
             <div className="bg-white text-black border-3 border-black rounded-md p-6 sm:p-8 space-y-6 shadow-[8px_8px_0px_#000000]">
               <h3 className="font-display font-black text-xl uppercase flex items-center gap-2 border-b-3 border-black pb-4">
@@ -223,7 +733,7 @@ export const RegisterPage: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-mono font-black uppercase mb-2">
+                  <label className="block text-xs font-sans font-black uppercase mb-2">
                     Team Name *
                   </label>
                   <input
@@ -237,13 +747,13 @@ export const RegisterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono font-black uppercase mb-2">
+                  <label className="block text-xs font-sans font-black uppercase mb-2">
                     Challenge Track *
                   </label>
                   <select
                     value={formData.track}
                     onChange={(e) => setFormData({ ...formData, track: e.target.value })}
-                    className="w-full bg-white border-2 border-black rounded p-3 text-black font-mono text-sm font-normal focus:shadow-[4px_4px_0px_#000000] focus:outline-none transition-all"
+                    className="w-full bg-white border-2 border-black rounded p-3 text-black font-sans text-sm font-normal focus:shadow-[4px_4px_0px_#000000] focus:outline-none transition-all"
                   >
                     <option value="fintech">FINTECH TRACK</option>
                     <option value="agritech">AGRICTECH TRACK</option>
@@ -262,7 +772,7 @@ export const RegisterPage: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-mono font-black uppercase mb-2">
+                  <label className="block text-xs font-sans font-black uppercase mb-2">
                     Full Name *
                   </label>
                   <input
@@ -276,7 +786,7 @@ export const RegisterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono font-black uppercase mb-2">
+                  <label className="block text-xs font-sans font-black uppercase mb-2">
                     Email Address *
                   </label>
                   <input
@@ -290,7 +800,7 @@ export const RegisterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono font-black uppercase mb-2">
+                  <label className="block text-xs font-sans font-black uppercase mb-2">
                     Phone / WhatsApp Number *
                   </label>
                   <input
@@ -304,7 +814,7 @@ export const RegisterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono font-black uppercase mb-2">
+                  <label className="block text-xs font-sans font-black uppercase mb-2">
                     University *
                   </label>
                   <input
@@ -318,7 +828,7 @@ export const RegisterPage: React.FC = () => {
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-mono font-black uppercase mb-2">
+                  <label className="block text-xs font-sans font-black uppercase mb-2">
                     Department & Level *
                   </label>
                   <input
@@ -344,7 +854,7 @@ export const RegisterPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleAddMember}
-                    className="neo-btn-primary px-3.5 py-2 text-xs font-mono font-extrabold flex items-center gap-1"
+                    className="neo-btn-primary px-3.5 py-2 text-xs font-sans font-extrabold flex items-center gap-1"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>ADD MEMBER</span>
@@ -353,15 +863,18 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               {formData.members.map((member, idx) => (
-                <div key={idx} className="p-4 rounded bg-gray-50 border-2 border-black space-y-4 shadow-[4px_4px_0px_#000000]">
+                <div
+                  key={idx}
+                  className="p-4 rounded bg-gray-50 border-2 border-black space-y-4 shadow-[4px_4px_0px_#000000]"
+                >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-black bg-black text-white px-2.5 py-0.5 rounded border border-black">
+                    <span className="font-sans text-xs font-black bg-black text-white px-2.5 py-0.5 rounded border border-black">
                       BUILDER #{idx + 2}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleRemoveMember(idx)}
-                      className="text-black hover:text-red-600 font-mono text-xs font-bold flex items-center gap-1"
+                      className="text-black hover:text-red-600 font-sans text-xs font-bold flex items-center gap-1"
                     >
                       <Trash2 className="w-4 h-4" />
                       <span>REMOVE</span>
@@ -393,7 +906,7 @@ export const RegisterPage: React.FC = () => {
                       <select
                         value={member.role}
                         onChange={(e) => handleMemberChange(idx, 'role', e.target.value)}
-                        className="w-full bg-white border-2 border-black rounded p-2.5 text-black font-mono text-xs font-normal focus:shadow-[3px_3px_0px_#000000] focus:outline-none"
+                        className="w-full bg-white border-2 border-black rounded p-2.5 text-black font-sans text-xs font-normal focus:shadow-[3px_3px_0px_#000000] focus:outline-none"
                       >
                         <option value="Frontend Developer">Frontend Developer</option>
                         <option value="Backend Developer">Backend Developer</option>
@@ -416,7 +929,7 @@ export const RegisterPage: React.FC = () => {
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-xs font-mono font-black uppercase mb-2">
+                  <label className="block text-xs font-sans font-black uppercase mb-2">
                     GitHub Profile / Team Portfolio Link *
                   </label>
                   <input
@@ -425,12 +938,12 @@ export const RegisterPage: React.FC = () => {
                     placeholder="https://github.com/your-username-or-team"
                     value={formData.githubPortfolio}
                     onChange={(e) => setFormData({ ...formData, githubPortfolio: e.target.value })}
-                    className="w-full bg-white border-2 border-black rounded p-3 text-black font-mono text-sm font-normal focus:shadow-[4px_4px_0px_#000000] focus:outline-none transition-all"
+                    className="w-full bg-white border-2 border-black rounded p-3 text-black font-sans text-sm font-normal focus:shadow-[4px_4px_0px_#000000] focus:outline-none transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono font-black uppercase mb-2">
+                  <label className="block text-xs font-sans font-black uppercase mb-2">
                     Project Idea & Proposed Tech Solution *
                   </label>
                   <textarea
@@ -444,7 +957,7 @@ export const RegisterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono font-black uppercase mb-2">
+                  <label className="block text-xs font-sans font-black uppercase mb-2">
                     Why should your team be selected into the 15 finalist cohort? *
                   </label>
                   <textarea
@@ -467,7 +980,7 @@ export const RegisterPage: React.FC = () => {
                 loading ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >
-              <span>{loading ? 'SUBMITTING APPLICATION...' : 'SUBMIT HACKATHON APPLICATION'}</span>
+              <span>{loading ? 'CHECKING DETAILS & SUBMITTING...' : 'SUBMIT HACKATHON APPLICATION'}</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           </form>
