@@ -196,7 +196,7 @@ export const RegisterPage: React.FC = () => {
       const uniqueMemberEmails = new Set(memberEmails);
       if (uniqueMemberEmails.size !== memberEmails.length) {
         throw new Error(
-          'Duplicate member emails detected in your team list. Each builder must have a unique email address.'
+          'Duplicate member emails detected in your team list. Each builder must be unique.'
         );
       }
 
@@ -370,8 +370,8 @@ export const RegisterPage: React.FC = () => {
               {isWelcomeBack
                 ? 'WELCOME BACK, BUILDER!'
                 : submitted
-                ? 'APPLICATION RECEIVED!'
-                : 'REGISTER YOUR TEAM'}
+                  ? 'APPLICATION RECEIVED!'
+                  : 'REGISTER YOUR TEAM'}
             </h1>
           </div>
 
@@ -443,7 +443,7 @@ export const RegisterPage: React.FC = () => {
                   {duplicateReason}
                 </p>
                 <p className="font-sans text-xs text-amber-800">
-                  To ensure equal opportunity and fair judging, each applicant is strictly limited to <strong>one team</strong> and <strong>one application</strong>. Your existing team record is already safely stored in our system below.
+                  To ensure equal opportunity and fair judging, each applicant is strictly limited to <strong>one team</strong> and <strong>one application</strong>. Your existing team record is already stored below.
                 </p>
               </div>
             )}
@@ -471,19 +471,18 @@ export const RegisterPage: React.FC = () => {
                     SCREENING STATUS
                   </span>
                   <span
-                    className={`inline-block px-3 py-1.5 rounded-md border-2 border-black font-sans text-xs font-black uppercase shadow-[3px_3px_0px_#000000] ${
-                      welcomeRecord.status === 'approved'
-                        ? 'bg-emerald-300 text-black'
-                        : welcomeRecord.status === 'rejected'
+                    className={`inline-block px-3 py-1.5 rounded-md border-2 border-black font-sans text-xs font-black uppercase shadow-[3px_3px_0px_#000000] ${welcomeRecord.status === 'approved'
+                      ? 'bg-emerald-300 text-black'
+                      : welcomeRecord.status === 'rejected'
                         ? 'bg-red-300 text-black'
                         : 'bg-yellow-300 text-black'
-                    }`}
+                      }`}
                   >
                     {welcomeRecord.status === 'approved'
                       ? 'SELECTED FINALIST (TOP 15)'
                       : welcomeRecord.status === 'rejected'
-                      ? 'NOT SELECTED'
-                      : 'UNDER REVIEW'}
+                        ? 'NOT SELECTED'
+                        : 'UNDER REVIEW'}
                   </span>
                 </div>
               </div>
@@ -976,9 +975,8 @@ export const RegisterPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full neo-btn-primary py-5 px-8 text-center text-sm sm:text-base font-display uppercase tracking-wider flex items-center justify-center gap-2 ${
-                loading ? 'opacity-70 cursor-not-allowed' : ''
-              }`}
+              className={`w-full neo-btn-primary py-5 px-8 text-center text-sm sm:text-base font-display uppercase tracking-wider flex items-center justify-center gap-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''
+                }`}
             >
               <span>{loading ? 'CHECKING DETAILS & SUBMITTING...' : 'SUBMIT HACKATHON APPLICATION'}</span>
               <ArrowRight className="w-5 h-5" />
