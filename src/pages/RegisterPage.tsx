@@ -17,7 +17,11 @@ import {
   Users,
   ShieldAlert,
   Printer,
-  Sparkles
+  Sparkles,
+  Trophy,
+  Calendar,
+  MapPin,
+  Coins
 } from 'lucide-react';
 import { RegistrationFormData } from '../types';
 import { supabase } from '../lib/supabase';
@@ -31,6 +35,9 @@ const normalizePhone = (phone: string) => {
 
 export const RegisterPage: React.FC = () => {
   const location = useLocation();
+
+  // Rules & Eligibility screen step
+  const [hasSeenRules, setHasSeenRules] = useState(false);
 
   // Submission state
   const [submitted, setSubmitted] = useState(false);
@@ -72,6 +79,7 @@ export const RegisterPage: React.FC = () => {
     const params = new URLSearchParams(location.search);
     if (params.get('lookup') === 'true' || location.pathname === '/status' || location.pathname === '/my-team') {
       setShowLookup(true);
+      setHasSeenRules(true);
     }
   }, [location]);
 
@@ -196,7 +204,7 @@ export const RegisterPage: React.FC = () => {
       const uniqueMemberEmails = new Set(memberEmails);
       if (uniqueMemberEmails.size !== memberEmails.length) {
         throw new Error(
-          'Duplicate member emails detected in your team list. Each builder must be unique.'
+          'Duplicate member emails detected in your team list. Each builder must have a unique email address.'
         );
       }
 
@@ -327,12 +335,17 @@ export const RegisterPage: React.FC = () => {
     }
   };
 
+  const handleProceedFromRules = () => {
+    setHasSeenRules(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-neo-hero text-black">
       <CustomCursor />
       <Navbar />
 
-      <main className="pt-36 pb-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="pt-36 pb-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Navigation & Header */}
         <div className="mb-10 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -371,14 +384,18 @@ export const RegisterPage: React.FC = () => {
                 ? 'WELCOME BACK, BUILDER!'
                 : submitted
                   ? 'APPLICATION RECEIVED!'
-                  : 'REGISTER YOUR TEAM'}
+                  : !hasSeenRules
+                    ? 'RULES & ELIGIBILITY'
+                    : 'REGISTER YOUR TEAM'}
             </h1>
           </div>
 
           <p className="font-sans font-medium text-xs sm:text-sm text-white bg-black px-6 py-2.5 rounded-md border-2 border-black shadow-[4px_4px_0px_#000000]">
             {isWelcomeBack
               ? 'Our system verified your registration record. Below are your existing application details.'
-              : 'Submit your team details and solution proposal for screening into the top 15 finalist cohort.'}
+              : !hasSeenRules
+                ? 'Review the participation rules, eligibility requirements, and cash prize details before beginning your application.'
+                : 'Submit your team details and solution proposal for screening into the top 15 finalist cohort.'}
           </p>
         </div>
 
@@ -471,18 +488,19 @@ export const RegisterPage: React.FC = () => {
                     SCREENING STATUS
                   </span>
                   <span
-                    className={`inline-block px-3 py-1.5 rounded-md border-2 border-black font-sans text-xs font-black uppercase shadow-[3px_3px_0px_#000000] ${welcomeRecord.status === 'approved'
-                      ? 'bg-emerald-300 text-black'
-                      : welcomeRecord.status === 'rejected'
+                    className={`inline-block px-3 py-1.5 rounded-md border-2 border-black font-sans text-xs font-black uppercase shadow-[3px_3px_0px_#000000] ${
+                      welcomeRecord.status === 'approved'
+                        ? 'bg-emerald-300 text-black'
+                        : welcomeRecord.status === 'rejected'
                         ? 'bg-red-300 text-black'
                         : 'bg-yellow-300 text-black'
-                      }`}
+                    }`}
                   >
                     {welcomeRecord.status === 'approved'
                       ? 'SELECTED FINALIST (TOP 15)'
                       : welcomeRecord.status === 'rejected'
-                        ? 'NOT SELECTED'
-                        : 'UNDER REVIEW'}
+                      ? 'NOT SELECTED'
+                      : 'UNDER REVIEW'}
                   </span>
                 </div>
               </div>
@@ -705,6 +723,7 @@ export const RegisterPage: React.FC = () => {
                 onClick={() => {
                   setSubmitted(false);
                   setIsWelcomeBack(false);
+                  setHasSeenRules(false);
                 }}
                 className="neo-btn-secondary px-8 py-3.5 text-xs font-sans uppercase font-bold"
               >
@@ -712,11 +731,218 @@ export const RegisterPage: React.FC = () => {
               </button>
             </div>
           </motion.div>
+        ) : !hasSeenRules ? (
+          /* ========================================================================= */
+          /* CASE 3: RULES & ELIGIBILITY SCREEN (INSPIRED BY IMAGE 2 + CASH PRIZES)    */
+          /* ========================================================================= */
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-[#EBF4EC] text-black border-3 border-black rounded-lg p-6 sm:p-12 shadow-[12px_12px_0px_#000000] space-y-10"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+              
+              {/* Left Column: Heading & Cash Prize Highlight */}
+              <div className="lg:col-span-5 space-y-6">
+                <div>
+                  <span className="font-sans font-black text-xs uppercase tracking-wider text-[#165B33] block mb-2">
+                    ELIGIBILITY
+                  </span>
+                  <h2 className="font-display font-black text-3xl sm:text-5xl text-[#0A381E] tracking-tight leading-tight">
+                    What every team needs.
+                  </h2>
+                </div>
+
+                <p className="font-sans font-medium text-xs sm:text-sm text-gray-800 leading-relaxed">
+                  Make sure your team satisfies all the requirements below before submitting your official solution proposal.
+                </p>
+
+                {/* PROMINENT CASH PRIZES HIGHLIGHT */}
+                <div className="bg-yellow-300 text-black border-2 border-black rounded-md p-5 shadow-[5px_5px_0px_#000000] space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-black text-yellow-300 flex items-center justify-center font-bold">
+                      <Trophy className="w-4 h-4" />
+                    </div>
+                    <span className="font-display font-black text-sm uppercase tracking-tight">
+                      CASH PRIZES & GRANTS
+                    </span>
+                  </div>
+                  <p className="font-sans text-xs font-semibold leading-relaxed text-gray-900">
+                    Winners will take home substantial <strong className="underline">cash prizes</strong>, cloud credits, venture incubation support, and direct investor pitch opportunities!
+                  </p>
+                </div>
+
+                {/* Event Highlights & Venue */}
+                <div className="p-4 bg-white border-2 border-black rounded-md shadow-[4px_4px_0px_#000000] space-y-3 font-sans text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <Calendar className="w-4 h-4 text-[#165B33] shrink-0" />
+                    <div>
+                      <strong className="text-black block">Virtual Sprint:</strong>
+                      <span className="text-gray-700">18th November 2026</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <Calendar className="w-4 h-4 text-[#165B33] shrink-0" />
+                    <div>
+                      <strong className="text-black block">Physical Grand Finale:</strong>
+                      <span className="text-gray-700">19th – 20th November 2026</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <MapPin className="w-4 h-4 text-[#165B33] shrink-0" />
+                    <div>
+                      <strong className="text-black block">Physical Venue:</strong>
+                      <span className="text-gray-700">OOU Tech Hub, ICT Building, OOU</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Action Button */}
+                <div className="hidden lg:block pt-2">
+                  <button
+                    type="button"
+                    onClick={handleProceedFromRules}
+                    className="w-full neo-btn-primary py-4 px-6 text-xs sm:text-sm font-display uppercase tracking-wider flex items-center justify-center gap-2 bg-black text-white hover:bg-[#165B33] transition-colors"
+                  >
+                    <span>PROCEED TO APPLICATION</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Column: Numbered Eligibility Checklist */}
+              <div className="lg:col-span-7 space-y-4">
+                
+                {/* Item 1 */}
+                <div className="flex items-start gap-4 p-3.5 bg-white border-2 border-black rounded-md shadow-[3px_3px_0px_#000000]">
+                  <div className="w-8 h-8 rounded-full bg-[#165B33] text-white flex items-center justify-center font-display font-black text-xs shrink-0 border border-black">
+                    1
+                  </div>
+                  <div className="font-sans text-xs sm:text-sm">
+                    <strong className="text-black block font-bold">Open to OOU Students (OOUites)</strong>
+                    <span className="text-gray-700 font-normal leading-relaxed">
+                      For teams with students from other tertiary institutions, at least one active member must be an OOU student.
+                    </span>
+                  </div>
+                </div>
+
+                {/* Item 2 */}
+                <div className="flex items-start gap-4 p-3.5 bg-white border-2 border-black rounded-md shadow-[3px_3px_0px_#000000]">
+                  <div className="w-8 h-8 rounded-full bg-[#165B33] text-white flex items-center justify-center font-display font-black text-xs shrink-0 border border-black">
+                    2
+                  </div>
+                  <div className="font-sans text-xs sm:text-sm">
+                    <strong className="text-black block font-bold">Must Participate as a Team</strong>
+                    <span className="text-gray-700 font-normal leading-relaxed">
+                      Minimum of <strong>2</strong> and maximum of <strong>5</strong> builders per team. Individual (solo) submissions are not eligible.
+                    </span>
+                  </div>
+                </div>
+
+                {/* Item 3 */}
+                <div className="flex items-start gap-4 p-3.5 bg-white border-2 border-black rounded-md shadow-[3px_3px_0px_#000000]">
+                  <div className="w-8 h-8 rounded-full bg-[#165B33] text-white flex items-center justify-center font-display font-black text-xs shrink-0 border border-black">
+                    3
+                  </div>
+                  <div className="font-sans text-xs sm:text-sm">
+                    <strong className="text-black block font-bold">Substantial Cash Prizes & Seed Funding</strong>
+                    <span className="text-gray-700 font-normal leading-relaxed">
+                      Top 3 finalist teams receive cash prizes, project incubation, sponsor perks, and certificates of excellence.
+                    </span>
+                  </div>
+                </div>
+
+                {/* Item 4 */}
+                <div className="flex items-start gap-4 p-3.5 bg-white border-2 border-black rounded-md shadow-[3px_3px_0px_#000000]">
+                  <div className="w-8 h-8 rounded-full bg-[#165B33] text-white flex items-center justify-center font-display font-black text-xs shrink-0 border border-black">
+                    4
+                  </div>
+                  <div className="font-sans text-xs sm:text-sm">
+                    <strong className="text-black block font-bold">Hybrid Sprint Format</strong>
+                    <span className="text-gray-700 font-normal leading-relaxed">
+                      Both virtual (online development sprint) and physical participation for the demo day and grand finale are available.
+                    </span>
+                  </div>
+                </div>
+
+                {/* Item 5 */}
+                <div className="flex items-start gap-4 p-3.5 bg-white border-2 border-black rounded-md shadow-[3px_3px_0px_#000000]">
+                  <div className="w-8 h-8 rounded-full bg-[#165B33] text-white flex items-center justify-center font-display font-black text-xs shrink-0 border border-black">
+                    5
+                  </div>
+                  <div className="font-sans text-xs sm:text-sm">
+                    <strong className="text-black block font-bold">100% Free Participation</strong>
+                    <span className="text-gray-700 font-normal leading-relaxed">
+                      Zero entry fees and zero hidden charges for all selected finalist teams.
+                    </span>
+                  </div>
+                </div>
+
+                {/* Item 6 */}
+                <div className="flex items-start gap-4 p-3.5 bg-white border-2 border-black rounded-md shadow-[3px_3px_0px_#000000]">
+                  <div className="w-8 h-8 rounded-full bg-[#165B33] text-white flex items-center justify-center font-display font-black text-xs shrink-0 border border-black">
+                    6
+                  </div>
+                  <div className="font-sans text-xs sm:text-sm">
+                    <strong className="text-black block font-bold">Solve a Real-World Problem</strong>
+                    <span className="text-gray-700 font-normal leading-relaxed">
+                      Your solution must address a tangible problem in Nigeria and fall under one of the 4 tracks: <strong>FinTech</strong>, <strong>AgriTech</strong>, <strong>Web3</strong>, or <strong>AI & Software</strong>.
+                    </span>
+                  </div>
+                </div>
+
+                {/* Item 7 */}
+                <div className="flex items-start gap-4 p-3.5 bg-white border-2 border-black rounded-md shadow-[3px_3px_0px_#000000]">
+                  <div className="w-8 h-8 rounded-full bg-[#165B33] text-white flex items-center justify-center font-display font-black text-xs shrink-0 border border-black">
+                    7
+                  </div>
+                  <div className="font-sans text-xs sm:text-sm">
+                    <strong className="text-black block font-bold">Availability for Mentorship & Pitching</strong>
+                    <span className="text-gray-700 font-normal leading-relaxed">
+                      Team members must be available for scheduled mentor office hours and live presentation before the jury.
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mobile Action Button */}
+                <div className="block lg:hidden pt-4">
+                  <button
+                    type="button"
+                    onClick={handleProceedFromRules}
+                    className="w-full neo-btn-primary py-4 px-6 text-xs sm:text-sm font-display uppercase tracking-wider flex items-center justify-center gap-2 bg-black text-white hover:bg-[#165B33] transition-colors"
+                  >
+                    <span>PROCEED TO APPLICATION</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+          </motion.div>
         ) : (
           /* ========================================================================= */
-          /* CASE 3: NEO-BRUTALIST REGISTRATION FORM                                   */
+          /* CASE 4: NEO-BRUTALIST REGISTRATION FORM                                   */
           /* ========================================================================= */
           <form onSubmit={handleSubmit} className="space-y-8">
+            
+            {/* Back button to view rules again */}
+            <div className="flex justify-between items-center bg-white p-3 border-2 border-black rounded-md shadow-[3px_3px_0px_#000000]">
+              <span className="text-xs font-sans font-bold text-gray-700">
+                Step 2 of 2: Team & Proposal Information
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setHasSeenRules(false);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-xs font-sans font-bold underline hover:text-[#165B33] text-black"
+              >
+                ← Review Eligibility & Rules
+              </button>
+            </div>
+
             {error && (
               <div className="p-4 rounded bg-red-100 border-3 border-black text-red-800 font-sans text-xs shadow-[4px_4px_0px_#000000] flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-red-700 shrink-0" />
@@ -975,8 +1201,9 @@ export const RegisterPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full neo-btn-primary py-5 px-8 text-center text-sm sm:text-base font-display uppercase tracking-wider flex items-center justify-center gap-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
+              className={`w-full neo-btn-primary py-5 px-8 text-center text-sm sm:text-base font-display uppercase tracking-wider flex items-center justify-center gap-2 ${
+                loading ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
             >
               <span>{loading ? 'CHECKING DETAILS & SUBMITTING...' : 'SUBMIT HACKATHON APPLICATION'}</span>
               <ArrowRight className="w-5 h-5" />
