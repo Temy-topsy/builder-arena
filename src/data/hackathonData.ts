@@ -199,7 +199,7 @@ export const BUILDER_PROFILES: BuilderProfile[] = [
     bio: 'Pioneering university tech innovation at OOU. Passionate about empowering student developers to build software that solves real Nigerian problems.',
     avatarUrl: '/Mayokun-Ademuwagun.jpg',
     skills: ['Product Strategy', 'Community Leadership', 'Fullstack Dev'],
-    badge: 'LEAD ORGANIZER',
+    badge: 'HACKATHON LEAD',
   },
   {
     id: 'usman-joseph',
