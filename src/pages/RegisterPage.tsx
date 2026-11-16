@@ -327,6 +327,34 @@ export const RegisterPage: React.FC = () => {
       setApplicationRecord(data);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Send confirmation email to Team Lead and alert to Admin
+      try {
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'team_registration',
+            payload: {
+              applicationId,
+              teamName: formData.teamName.trim(),
+              track: formData.track,
+              teamLeadName: formData.teamLeadName.trim(),
+              teamLeadEmail: leadEmailNorm,
+              teamLeadPhone: formData.teamLeadPhone.trim(),
+              departmentLevel: formData.university,
+              matricNumber: formData.department,
+              members: formData.members,
+              githubPortfolio: formData.githubPortfolio,
+              problemStatement: `${formData.projectIdea}\n\nWhy selected: ${formData.whySelected}`,
+            },
+          }),
+        });
+      } catch (mailErr) {
+        console.warn('Background email dispatch error (non-blocking):', mailErr);
+      }
     } catch (err: any) {
       console.error('Registration submission error:', err);
       setError(err.message || 'Network error occurred while submitting.');

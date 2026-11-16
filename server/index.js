@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { sql, initDb } from './db.js';
+import sendEmailHandler from '../api/send-email.js';
 
 dotenv.config();
 
@@ -11,6 +12,9 @@ const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || 'arena2026!admin';
 
 app.use(cors());
 app.use(express.json());
+
+// Email dispatch route
+app.all('/api/send-email', (req, res) => sendEmailHandler(req, res));
 
 // Helper for generating application/proposal IDs
 function generateId(prefix) {

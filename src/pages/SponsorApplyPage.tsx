@@ -121,7 +121,34 @@ export const SponsorApplyPage: React.FC = () => {
         }
       );
 
-      // 2. Trigger mailto client
+      // 2. Dispatch automated emails (to sponsor & OTC team)
+      try {
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'sponsor_proposal',
+            payload: {
+              proposalId,
+              companyName: formData.companyName,
+              tier: formData.tier,
+              contactName: formData.contactName,
+              contactEmail: formData.contactEmail,
+              contactPhone: formData.contactPhone,
+              companyWebsite: formData.companyWebsite || '',
+              industry: formData.industry || 'Fintech',
+              contributionType: formData.contributionType || [],
+              notes: formData.notes || '',
+            },
+          }),
+        });
+      } catch (mailErr) {
+        console.warn('Background sponsor email dispatch error (non-blocking):', mailErr);
+      }
+
+      // 3. Trigger mailto client as secondary convenience
       const mailtoUrl = generateMailtoUrl();
       window.location.href = mailtoUrl;
 

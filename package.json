@@ -20,12 +20,14 @@
     "express": "^5.2.1",
     "framer-motion": "^11.11.17",
     "lucide-react": "^0.454.0",
+    "nodemailer": "^10.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.27.0",
     "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
+    "@types/nodemailer": "^8.0.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
