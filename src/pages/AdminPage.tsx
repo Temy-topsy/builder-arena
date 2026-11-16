@@ -23,6 +23,9 @@ import {
   Award,
   AlertTriangle,
   Trash2,
+  Send,
+  Check,
+  Sparkles,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -98,6 +101,22 @@ export const AdminPage: React.FC = () => {
   // Inspection Modal states
   const [selectedTeam, setSelectedTeam] = useState<TeamRegistration | null>(null);
   const [selectedSponsor, setSelectedSponsor] = useState<SponsorApplication | null>(null);
+
+  // Email Dispatch Modal states
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [emailTargetMode, setEmailTargetMode] = useState<
+    'single' | 'all_teams' | 'approved_teams' | 'under_review_teams' | 'all_sponsors' | 'custom'
+  >('all_teams');
+  const [emailToInput, setEmailToInput] = useState('');
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailHeading, setEmailHeading] = useState('');
+  const [emailBadge, setEmailBadge] = useState('OFFICIAL ANNOUNCEMENT');
+  const [emailMessage, setEmailMessage] = useState('');
+  const [emailActionText, setEmailActionText] = useState('');
+  const [emailActionUrl, setEmailActionUrl] = useState('');
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailToast, setEmailToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [activeTemplate, setActiveTemplate] = useState('finalist_selection');
 
   // Handle Login
   const handleLogin = async (e: React.FormEvent) => {
@@ -327,6 +346,185 @@ export const AdminPage: React.FC = () => {
     }
   };
 
+  // Email Helper Functions
+  const handleSelectTemplate = (templateKey: string) => {
+    setActiveTemplate(templateKey);
+    if (templateKey === 'finalist_selection') {
+      setEmailSubject('[Builders Arena 2026] Congratulations! Your Team Has Been Selected as a Finalist!');
+      setEmailHeading('🎉 CONGRATULATIONS! TOP 15 FINALIST SELECTION');
+      setEmailBadge('FINALIST SELECTION');
+      setEmailMessage(
+        `Hello Team,\n\nWe are thrilled to officially announce that your team has been selected into the Top 15 Finalist Cohort for Builders Arena 2026!\n\nKey Next Steps:\n1. Confirm Attendance: Ensure your full team is ready for both the Virtual Sprint and Physical Grand Finale.\n2. Join Finalist WhatsApp Channel: Connect with mentors and organizers.\n3. Prepare Your Environment: Have your Git repositories, dev stack, and APIs ready.\n\nSchedule:\n• Virtual Coding Sprint: 18th November 2026\n• Physical Grand Finale & Pitch: 19th – 20th November 2026 at OOU Tech Hub, ICT Building, Ago-Iwoye\n\nWe look forward to seeing your working prototype in action!`
+      );
+      setEmailActionText('JOIN FINALIST WHATSAPP');
+      setEmailActionUrl('https://wa.me/2348061764593');
+    } else if (templateKey === 'schedule_reminder') {
+      setEmailSubject('[Builders Arena 2026] Important Reminder: Grand Finale Schedule & Venue Details');
+      setEmailHeading('🗓️ GRAND FINALE SCHEDULE & VENUE DETAILS');
+      setEmailBadge('VENUE & SCHEDULE');
+      setEmailMessage(
+        `Hello Builders,\n\nHere is your briefing for the Builders Arena 2026 Grand Finale:\n\n• Venue: OOU Tech Hub, ICT Building, OOU Main Campus, Ago-Iwoye, Ogun State\n• Virtual Sprint Kickoff: 18th November 2026 (09:00 AM WAT)\n• Physical Check-In & Setup: 19th November 2026 (08:30 AM WAT)\n• Live Demo & Jury Pitching: 20th November 2026\n\nSnacks, Wi-Fi, workspace power, and swag will be provided. Please arrive with your laptops, chargers, and identification.`
+      );
+      setEmailActionText('VIEW EVENT SCHEDULE');
+      setEmailActionUrl('https://builder-arena.vercel.app/schedule');
+    } else if (templateKey === 'screening_update') {
+      setEmailSubject('[Builders Arena 2026] Update Regarding Your Application');
+      setEmailHeading('APPLICATION SCREENING UPDATE');
+      setEmailBadge('SCREENING STATUS');
+      setEmailMessage(
+        `Hello Team,\n\nThank you for your patience while our technical screening jury evaluates all team proposals for Builders Arena 2026.\n\nYour application is currently under review. Our panel is assessing technical feasibility, problem statement relevance, and track alignment.\n\nFinalist announcements will be communicated via email and official community channels.`
+      );
+      setEmailActionText('CHECK APPLICATION STATUS');
+      setEmailActionUrl('https://builder-arena.vercel.app/register?lookup=true');
+    } else if (templateKey === 'blank') {
+      setEmailSubject('');
+      setEmailHeading('');
+      setEmailBadge('OFFICIAL ANNOUNCEMENT');
+      setEmailMessage('');
+      setEmailActionText('');
+      setEmailActionUrl('');
+    }
+  };
+
+  const openEmailComposerForTeam = (team: TeamRegistration) => {
+    setEmailTargetMode('single');
+    setEmailToInput(team.team_lead_email);
+    setEmailSubject(`[Builders Arena 2026] Update for Team ${team.team_name}`);
+    setEmailHeading(`Team ${team.team_name} - Hackathon Briefing`);
+    setEmailBadge(`${team.track.toUpperCase()} TRACK`);
+    setEmailMessage(
+      `Hello ${team.team_lead_name} and Team ${team.team_name},\n\nWe are writing from the Builders Arena 2026 Organizing Committee regarding your application (${team.application_id}).`
+    );
+    setEmailActionText('VIEW TEAM PORTAL');
+    setEmailActionUrl('https://builder-arena.vercel.app/register?lookup=true');
+    setEmailToast(null);
+    setEmailModalOpen(true);
+  };
+
+  const openEmailComposerForSponsor = (sponsor: SponsorApplication) => {
+    setEmailTargetMode('single');
+    setEmailToInput(sponsor.contact_email);
+    setEmailSubject(`[Builders Arena 2026] Partnership Update - ${sponsor.company_name}`);
+    setEmailHeading(`${sponsor.company_name} - Partnership Engagement`);
+    setEmailBadge(`${sponsor.tier.toUpperCase()} SPONSOR`);
+    setEmailMessage(
+      `Dear ${sponsor.contact_name},\n\nThank you for partnering with Builders Arena 2026. Here is an update regarding our sponsorship deliverables, branding placement, and event logistics.`
+    );
+    setEmailActionText('VIEW SPONSOR DECK');
+    setEmailActionUrl('https://builder-arena.vercel.app/sponsors');
+    setEmailToast(null);
+    setEmailModalOpen(true);
+  };
+
+  const openBroadcastComposer = (
+    mode: 'all_teams' | 'approved_teams' | 'under_review_teams' | 'all_sponsors' = 'all_teams'
+  ) => {
+    setEmailTargetMode(mode);
+    setEmailToInput('');
+    handleSelectTemplate(mode === 'approved_teams' ? 'finalist_selection' : 'schedule_reminder');
+    setEmailToast(null);
+    setEmailModalOpen(true);
+  };
+
+  const calculatedRecipients = useMemo(() => {
+    if (emailTargetMode === 'single' || emailTargetMode === 'custom') {
+      return emailToInput
+        .split(',')
+        .map((e) => e.trim().toLowerCase())
+        .filter((e) => e && e.includes('@'));
+    }
+    if (emailTargetMode === 'all_teams') {
+      return Array.from(
+        new Set(teams.map((t) => (t.team_lead_email || '').trim().toLowerCase()).filter((e) => e && e.includes('@')))
+      );
+    }
+    if (emailTargetMode === 'approved_teams') {
+      return Array.from(
+        new Set(
+          teams
+            .filter((t) => t.status === 'approved')
+            .map((t) => (t.team_lead_email || '').trim().toLowerCase())
+            .filter((e) => e && e.includes('@'))
+        )
+      );
+    }
+    if (emailTargetMode === 'under_review_teams') {
+      return Array.from(
+        new Set(
+          teams
+            .filter((t) => t.status === 'under_review')
+            .map((t) => (t.team_lead_email || '').trim().toLowerCase())
+            .filter((e) => e && e.includes('@'))
+        )
+      );
+    }
+    if (emailTargetMode === 'all_sponsors') {
+      return Array.from(
+        new Set(sponsors.map((s) => (s.contact_email || '').trim().toLowerCase()).filter((e) => e && e.includes('@')))
+      );
+    }
+    return [];
+  }, [emailTargetMode, emailToInput, teams, sponsors]);
+
+  const handleSendEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (calculatedRecipients.length === 0) {
+      setEmailToast({ type: 'error', message: 'No valid recipient email addresses found.' });
+      return;
+    }
+    if (!emailSubject.trim() || !emailMessage.trim()) {
+      setEmailToast({ type: 'error', message: 'Subject and message body cannot be empty.' });
+      return;
+    }
+
+    setEmailSending(true);
+    setEmailToast(null);
+
+    try {
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'admin_direct_email',
+          payload: {
+            to: calculatedRecipients,
+            subject: emailSubject.trim(),
+            heading: emailHeading.trim() || emailSubject.trim(),
+            badgeText: emailBadge.trim() || 'OFFICIAL ANNOUNCEMENT',
+            message: emailMessage.trim(),
+            actionButtonText: emailActionText.trim(),
+            actionButtonUrl: emailActionUrl.trim(),
+          },
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to send email.');
+      }
+
+      setEmailToast({
+        type: 'success',
+        message: `Email successfully delivered to ${calculatedRecipients.length} recipient(s)!`,
+      });
+
+      setTimeout(() => {
+        setEmailModalOpen(false);
+        setEmailToast(null);
+      }, 2200);
+    } catch (err: any) {
+      console.error('Email send error:', err);
+      setEmailToast({
+        type: 'error',
+        message: err.message || 'Error occurred while sending email.',
+      });
+    } finally {
+      setEmailSending(false);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'approved':
@@ -518,13 +716,23 @@ export const AdminPage: React.FC = () => {
             </button>
           </div>
 
-          <button
-            onClick={exportCSV}
-            className="neo-btn-secondary px-4 py-2.5 text-xs font-mono uppercase font-bold flex items-center justify-center gap-1.5"
-          >
-            <Download className="w-4 h-4" />
-            <span>EXPORT CSV</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => openBroadcastComposer('all_teams')}
+              className="bg-yellow-300 hover:bg-yellow-400 text-black px-4 py-2.5 rounded font-display font-bold text-xs uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_#000000] flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <Mail className="w-4 h-4" />
+              <span>SEND EMAIL / BROADCAST</span>
+            </button>
+
+            <button
+              onClick={exportCSV}
+              className="neo-btn-secondary px-4 py-2.5 text-xs font-sans uppercase font-bold flex items-center justify-center gap-1.5"
+            >
+              <Download className="w-4 h-4" />
+              <span>EXPORT CSV</span>
+            </button>
+          </div>
         </div>
 
         {/* Filter & Search Bar */}
@@ -639,6 +847,13 @@ export const AdminPage: React.FC = () => {
                         </td>
                         <td className="p-3.5 text-right whitespace-nowrap space-x-1.5">
                           <button
+                            onClick={() => openEmailComposerForTeam(team)}
+                            className="p-1.5 rounded bg-white hover:bg-yellow-300 border border-black transition-colors"
+                            title="Send Email to Team Lead"
+                          >
+                            <Mail className="w-3.5 h-3.5 text-black" />
+                          </button>
+                          <button
                             onClick={() => setSelectedTeam(team)}
                             className="p-1.5 rounded bg-white hover:bg-[#00D9FF] border border-black transition-colors"
                             title="Inspect Application"
@@ -723,6 +938,13 @@ export const AdminPage: React.FC = () => {
                           {new Date(sponsor.created_at).toLocaleDateString()}
                         </td>
                         <td className="p-3.5 text-right whitespace-nowrap space-x-1.5">
+                          <button
+                            onClick={() => openEmailComposerForSponsor(sponsor)}
+                            className="p-1.5 rounded bg-white hover:bg-yellow-300 border border-black transition-colors"
+                            title="Send Email to Sponsor"
+                          >
+                            <Mail className="w-3.5 h-3.5 text-black" />
+                          </button>
                           <button
                             onClick={() => setSelectedSponsor(sponsor)}
                             className="p-1.5 rounded bg-white hover:bg-[#FF9F00] border border-black transition-colors"
@@ -854,6 +1076,13 @@ export const AdminPage: React.FC = () => {
               {/* Action Buttons */}
               <div className="pt-4 border-t-3 border-black flex flex-wrap gap-2 justify-end">
                 <button
+                  onClick={() => openEmailComposerForTeam(selectedTeam)}
+                  className="px-4 py-2 bg-yellow-300 hover:bg-yellow-400 font-sans text-xs font-bold uppercase rounded border-2 border-black flex items-center gap-1.5 shadow-[2px_2px_0px_#000000]"
+                >
+                  <Mail className="w-3.5 h-3.5 text-black" />
+                  <span>Send Email</span>
+                </button>
+                <button
                   onClick={() => updateTeamStatus(selectedTeam.id, 'under_review')}
                   className="px-4 py-2 bg-yellow-300 hover:bg-yellow-400 font-mono text-xs font-bold uppercase rounded border-2 border-black"
                 >
@@ -956,6 +1185,13 @@ export const AdminPage: React.FC = () => {
               {/* Action Buttons */}
               <div className="pt-4 border-t-3 border-black flex flex-wrap gap-2 justify-end">
                 <button
+                  onClick={() => openEmailComposerForSponsor(selectedSponsor)}
+                  className="px-4 py-2 bg-yellow-300 hover:bg-yellow-400 font-sans text-xs font-bold uppercase rounded border-2 border-black flex items-center gap-1.5 shadow-[2px_2px_0px_#000000]"
+                >
+                  <Mail className="w-3.5 h-3.5 text-black" />
+                  <span>Send Email</span>
+                </button>
+                <button
                   onClick={() => updateSponsorStatus(selectedSponsor.id, 'under_review')}
                   className="px-4 py-2 bg-yellow-300 hover:bg-yellow-400 font-mono text-xs font-bold uppercase rounded border-2 border-black"
                 >
@@ -974,6 +1210,299 @@ export const AdminPage: React.FC = () => {
                   Approve Proposal
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* EMAIL DISPATCH COMPOSER MODAL */}
+      <AnimatePresence>
+        {emailModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 overflow-y-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-2xl bg-white text-black border-3 border-black rounded-md p-6 sm:p-8 max-h-[92vh] overflow-y-auto shadow-[12px_12px_0px_#000000] space-y-6"
+            >
+              <button
+                onClick={() => {
+                  setEmailModalOpen(false);
+                  setEmailToast(null);
+                }}
+                className="absolute top-5 right-5 p-2 rounded bg-black text-white hover:bg-[#00D9FF] hover:text-black border-2 border-black transition-colors"
+                title="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Modal Header */}
+              <div className="border-b-3 border-black pb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="neo-tag text-[10px]">EMAIL DISPATCHER</span>
+                  <span className="neo-tag-accent text-[10px]">SMTP GMAIL</span>
+                </div>
+                <h2 className="font-display font-black text-2xl sm:text-3xl uppercase tracking-tight flex items-center gap-2">
+                  <Mail className="w-6 h-6 text-black" />
+                  <span>COMPOSE & SEND EMAIL</span>
+                </h2>
+                <p className="font-sans text-xs text-gray-700 mt-1">
+                  Sends branded neo-brutalist emails from <strong>ooutechcommunity@gmail.com</strong> directly to participants or sponsors.
+                </p>
+              </div>
+
+              {/* Toast feedback */}
+              {emailToast && (
+                <div
+                  className={`p-3.5 rounded border-2 border-black flex items-center gap-2 text-xs font-sans font-bold shadow-[3px_3px_0px_#000000] ${
+                    emailToast.type === 'success' ? 'bg-emerald-200 text-emerald-950' : 'bg-red-200 text-red-950'
+                  }`}
+                >
+                  {emailToast.type === 'success' ? <Check className="w-4 h-4 shrink-0" /> : <AlertTriangle className="w-4 h-4 shrink-0" />}
+                  <span>{emailToast.message}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSendEmail} className="space-y-5">
+                {/* 1. Recipient Target Selector */}
+                <div>
+                  <label className="block text-xs font-sans font-black uppercase mb-2">
+                    RECIPIENT TARGET GROUP:
+                  </label>
+                  <div className="flex flex-wrap gap-2 text-xs font-sans">
+                    <button
+                      type="button"
+                      onClick={() => setEmailTargetMode('all_teams')}
+                      className={`px-3 py-1.5 rounded border-2 border-black font-bold uppercase transition-colors ${
+                        emailTargetMode === 'all_teams' ? 'bg-[#00D9FF] text-black shadow-[2px_2px_0px_#000000]' : 'bg-gray-100 hover:bg-gray-200'
+                      }`}
+                    >
+                      All Teams ({teams.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEmailTargetMode('approved_teams')}
+                      className={`px-3 py-1.5 rounded border-2 border-black font-bold uppercase transition-colors ${
+                        emailTargetMode === 'approved_teams' ? 'bg-[#00D9FF] text-black shadow-[2px_2px_0px_#000000]' : 'bg-gray-100 hover:bg-gray-200'
+                      }`}
+                    >
+                      Approved Finalists ({teams.filter((t) => t.status === 'approved').length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEmailTargetMode('under_review_teams')}
+                      className={`px-3 py-1.5 rounded border-2 border-black font-bold uppercase transition-colors ${
+                        emailTargetMode === 'under_review_teams' ? 'bg-[#00D9FF] text-black shadow-[2px_2px_0px_#000000]' : 'bg-gray-100 hover:bg-gray-200'
+                      }`}
+                    >
+                      Under Review ({teams.filter((t) => t.status === 'under_review').length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEmailTargetMode('all_sponsors')}
+                      className={`px-3 py-1.5 rounded border-2 border-black font-bold uppercase transition-colors ${
+                        emailTargetMode === 'all_sponsors' ? 'bg-[#FF9F00] text-black shadow-[2px_2px_0px_#000000]' : 'bg-gray-100 hover:bg-gray-200'
+                      }`}
+                    >
+                      All Sponsors ({sponsors.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEmailTargetMode('custom')}
+                      className={`px-3 py-1.5 rounded border-2 border-black font-bold uppercase transition-colors ${
+                        emailTargetMode === 'custom' || emailTargetMode === 'single'
+                          ? 'bg-yellow-300 text-black shadow-[2px_2px_0px_#000000]'
+                          : 'bg-gray-100 hover:bg-gray-200'
+                      }`}
+                    >
+                      Single / Custom
+                    </button>
+                  </div>
+                </div>
+
+                {/* Recipient Input (if single/custom) */}
+                {(emailTargetMode === 'custom' || emailTargetMode === 'single') && (
+                  <div>
+                    <label className="block text-xs font-sans font-black uppercase mb-1.5">
+                      RECIPIENT EMAIL(S) (Comma-separated for multiple):
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. lead@university.edu.ng, member@gmail.com"
+                      value={emailToInput}
+                      onChange={(e) => setEmailToInput(e.target.value)}
+                      className="w-full bg-white border-2 border-black rounded p-2.5 text-xs font-sans focus:outline-none focus:shadow-[3px_3px_0px_#000000]"
+                    />
+                  </div>
+                )}
+
+                {/* Recipient Count Indicator */}
+                <div className="p-3 bg-gray-50 border-2 border-black rounded flex items-center justify-between text-xs font-sans">
+                  <span className="text-gray-700 font-medium">RECIPIENTS RESOLVED:</span>
+                  <span className="font-black bg-[#00D9FF] px-2.5 py-0.5 rounded border border-black">
+                    {calculatedRecipients.length} Recipient(s)
+                  </span>
+                </div>
+
+                {/* 2. Quick Templates Selector */}
+                <div>
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
+                    <label className="text-xs font-sans font-black uppercase">
+                      LOAD PRESET TEMPLATE:
+                    </label>
+                  </div>
+                  <div className="flex flex-wrap gap-2 text-[11px] font-sans">
+                    <button
+                      type="button"
+                      onClick={() => handleSelectTemplate('finalist_selection')}
+                      className={`px-2.5 py-1 rounded border border-black font-bold transition-colors ${
+                        activeTemplate === 'finalist_selection' ? 'bg-yellow-300' : 'bg-white hover:bg-gray-100'
+                      }`}
+                    >
+                      🎉 Top 15 Finalist Selection
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectTemplate('schedule_reminder')}
+                      className={`px-2.5 py-1 rounded border border-black font-bold transition-colors ${
+                        activeTemplate === 'schedule_reminder' ? 'bg-yellow-300' : 'bg-white hover:bg-gray-100'
+                      }`}
+                    >
+                      🗓️ Schedule & Venue Details
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectTemplate('screening_update')}
+                      className={`px-2.5 py-1 rounded border border-black font-bold transition-colors ${
+                        activeTemplate === 'screening_update' ? 'bg-yellow-300' : 'bg-white hover:bg-gray-100'
+                      }`}
+                    >
+                      ⏳ Screening Status Update
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectTemplate('blank')}
+                      className={`px-2.5 py-1 rounded border border-black font-bold transition-colors ${
+                        activeTemplate === 'blank' ? 'bg-yellow-300' : 'bg-white hover:bg-gray-100'
+                      }`}
+                    >
+                      ✏️ Blank Custom Email
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3. Email Subject */}
+                <div>
+                  <label className="block text-xs font-sans font-black uppercase mb-1.5">
+                    EMAIL SUBJECT LINE *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. [Builders Arena 2026] Important Update"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    className="w-full bg-white border-2 border-black rounded p-2.5 text-xs font-sans font-semibold focus:outline-none focus:shadow-[3px_3px_0px_#000000]"
+                  />
+                </div>
+
+                {/* 4. Heading & Badge */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-sans font-black uppercase mb-1.5">
+                      EMAIL HEADER TITLE
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. HACKATHON BRIEFING"
+                      value={emailHeading}
+                      onChange={(e) => setEmailHeading(e.target.value)}
+                      className="w-full bg-white border-2 border-black rounded p-2.5 text-xs font-sans focus:outline-none focus:shadow-[3px_3px_0px_#000000]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-sans font-black uppercase mb-1.5">
+                      CATEGORY BADGE
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. OFFICIAL ANNOUNCEMENT"
+                      value={emailBadge}
+                      onChange={(e) => setEmailBadge(e.target.value)}
+                      className="w-full bg-white border-2 border-black rounded p-2.5 text-xs font-sans focus:outline-none focus:shadow-[3px_3px_0px_#000000]"
+                    />
+                  </div>
+                </div>
+
+                {/* 5. Message Body */}
+                <div>
+                  <label className="block text-xs font-sans font-black uppercase mb-1.5">
+                    MESSAGE CONTENT *
+                  </label>
+                  <textarea
+                    rows={6}
+                    required
+                    placeholder="Write your email body here. Double-line breaks create distinct paragraphs..."
+                    value={emailMessage}
+                    onChange={(e) => setEmailMessage(e.target.value)}
+                    className="w-full bg-white border-2 border-black rounded p-3 text-xs font-sans leading-relaxed focus:outline-none focus:shadow-[3px_3px_0px_#000000]"
+                  />
+                </div>
+
+                {/* 6. Optional Action Button */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-sans font-black uppercase mb-1.5">
+                      CALL-TO-ACTION BUTTON TEXT (OPTIONAL)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. JOIN WHATSAPP COMMUNITY"
+                      value={emailActionText}
+                      onChange={(e) => setEmailActionText(e.target.value)}
+                      className="w-full bg-white border-2 border-black rounded p-2.5 text-xs font-sans focus:outline-none focus:shadow-[3px_3px_0px_#000000]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-sans font-black uppercase mb-1.5">
+                      CALL-TO-ACTION URL (OPTIONAL)
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="e.g. https://wa.me/2348061764593"
+                      value={emailActionUrl}
+                      onChange={(e) => setEmailActionUrl(e.target.value)}
+                      className="w-full bg-white border-2 border-black rounded p-2.5 text-xs font-sans focus:outline-none focus:shadow-[3px_3px_0px_#000000]"
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="pt-4 border-t-3 border-black flex flex-wrap gap-3 justify-end items-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmailModalOpen(false);
+                      setEmailToast(null);
+                    }}
+                    className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 font-sans text-xs font-bold uppercase rounded border-2 border-black transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={emailSending || calculatedRecipients.length === 0}
+                    className={`neo-btn-primary px-6 py-2.5 text-xs font-display uppercase tracking-wider flex items-center gap-2 ${
+                      emailSending || calculatedRecipients.length === 0 ? 'opacity-60 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>{emailSending ? 'DISPATCHING EMAILS...' : `SEND EMAIL (${calculatedRecipients.length})`}</span>
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </div>
         )}

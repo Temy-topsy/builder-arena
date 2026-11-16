@@ -334,6 +334,146 @@ export default async function handler(req, res) {
       });
     }
 
+    // TYPE 3: Admin Custom / Direct Email (Broadcast or Individual Team)
+    if (type === 'admin_direct_email') {
+      const {
+        to,
+        subject,
+        heading,
+        message,
+        badgeText,
+        actionButtonText,
+        actionButtonUrl,
+      } = payload;
+
+      if (!to || (!Array.isArray(to) && typeof to !== 'string')) {
+        return res.status(400).json({ error: 'Missing recipient email(s).' });
+      }
+
+      if (!subject || !message) {
+        return res.status(400).json({ error: 'Subject and message are required.' });
+      }
+
+      const rawRecipients = Array.isArray(to)
+        ? to
+        : typeof to === 'string'
+        ? to.split(',')
+        : [];
+
+      const recipients = Array.from(
+        new Set(rawRecipients.map((e) => (typeof e === 'string' ? e.trim().toLowerCase() : '')).filter((e) => e && e.includes('@')))
+      );
+
+      if (recipients.length === 0) {
+        return res.status(400).json({ error: 'No valid recipient emails found.' });
+      }
+
+      const formattedMessageHtml = message
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n\n/g, '</p><p style="margin: 0 0 16px 0; line-height: 1.6; font-size: 14px; color: #1F2937;">')
+        .replace(/\n/g, '<br>');
+
+      const customEmailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin: 0; padding: 24px 12px; background-color: #F8FAFC; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #000;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border: 3px solid #000000; box-shadow: 6px 6px 0px #000000; border-radius: 8px; overflow: hidden;">
+    <!-- Header -->
+    <tr>
+      <td style="background-color: #060A20; padding: 28px 24px; text-align: center; border-bottom: 3px solid #000000;">
+        <div style="display: inline-block; background-color: #FFC700; color: #000; padding: 4px 12px; font-weight: 800; font-size: 11px; text-transform: uppercase; border: 2px solid #000; border-radius: 4px; margin-bottom: 12px; letter-spacing: 0.5px;">
+          OOU TECH COMMUNITY (OTC)
+        </div>
+        <h1 style="color: #FFFFFF; margin: 0; font-size: 24px; font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase;">
+          BUILDERS ARENA 2026
+        </h1>
+        <p style="color: #00E5FF; margin: 6px 0 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+          ${badgeText || 'OFFICIAL ANNOUNCEMENT'}
+        </p>
+      </td>
+    </tr>
+
+    <!-- Body Content -->
+    <tr>
+      <td style="padding: 32px 24px;">
+        ${heading ? `
+          <h2 style="font-size: 19px; font-weight: 900; margin-top: 0; margin-bottom: 18px; text-transform: uppercase; color: #000; border-bottom: 2px solid #000; padding-bottom: 10px;">
+            ${heading}
+          </h2>
+        ` : ''}
+
+        <div style="font-size: 14px; line-height: 1.6; color: #1F2937;">
+          <p style="margin: 0 0 16px 0; line-height: 1.6; font-size: 14px; color: #1F2937;">
+            ${formattedMessageHtml}
+          </p>
+        </div>
+
+        ${actionButtonUrl ? `
+          <div style="text-align: center; margin: 32px 0 20px 0;">
+            <a href="${actionButtonUrl}" style="display: inline-block; background-color: #00E5FF; color: #000; padding: 14px 28px; text-decoration: none; font-weight: 900; font-size: 13px; text-transform: uppercase; border: 2px solid #000; box-shadow: 4px 4px 0px #000; border-radius: 6px;">
+              ${actionButtonText || 'VIEW DETAILS'}
+            </a>
+          </div>
+        ` : ''}
+
+        <!-- Community Callout Box -->
+        <div style="background-color: #FFF9DB; border: 2px solid #000; border-radius: 6px; padding: 14px 18px; margin-top: 28px;">
+          <p style="margin: 0; font-size: 12px; color: #000; line-height: 1.5;">
+            <strong>💬 Questions or updates?</strong> Join our official WhatsApp community or contact the OTC Organizing Team at <a href="mailto:ooutechcommunity@gmail.com" style="color: #000; font-weight: bold;">ooutechcommunity@gmail.com</a>.
+          </p>
+        </div>
+      </td>
+    </tr>
+
+    <!-- Footer -->
+    <tr>
+      <td style="background-color: #F3F4F6; padding: 20px 24px; border-top: 2px solid #000000; text-align: center; font-size: 11px; color: #6B7280;">
+        <p style="margin: 0 0 6px 0; font-weight: 700; color: #111827;">
+          OOU TECH COMMUNITY (OTC) • BUILDERS ARENA 2026
+        </p>
+        <p style="margin: 0;">
+          Olabisi Onabanjo University, Ago-Iwoye, Ogun State, Nigeria.<br>
+          Sent directly from the Builders Arena Organizing Desk.
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`;
+
+      if (recipients.length === 1) {
+        await transporter.sendMail({
+          from: `"Builders Arena 2026" <${senderEmail}>`,
+          to: recipients[0],
+          subject,
+          html: customEmailHtml,
+        });
+      } else {
+        // Send using BCC to protect participant privacy in bulk dispatches
+        await transporter.sendMail({
+          from: `"Builders Arena 2026" <${senderEmail}>`,
+          to: senderEmail,
+          bcc: recipients,
+          subject,
+          html: customEmailHtml,
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: `Email successfully delivered to ${recipients.length} recipient(s).`,
+        count: recipients.length,
+      });
+    }
+
     return res.status(400).json({ error: `Unknown email type: ${type}` });
   } catch (err) {
     console.error('Send Email Error:', err);
