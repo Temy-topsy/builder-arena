@@ -350,11 +350,11 @@ export const AdminPage: React.FC = () => {
   const handleSelectTemplate = (templateKey: string) => {
     setActiveTemplate(templateKey);
     if (templateKey === 'kickoff_now') {
-      setEmailSubject('🚀 [Builders Arena 2026] Hackathon Kickoff! Starting 9:30 AM Today');
-      setEmailHeading('🚀 BUILDERS ARENA 2026 IS LIVE!');
-      setEmailBadge('HACKATHON KICKOFF');
+      setEmailSubject('⚡ [Builders Arena 2026] Hackathon Update: Now 100% Online — Time to Build!');
+      setEmailHeading('⚡ ORIENTATION CONCLUDED — TIME TO BUILD!');
+      setEmailBadge('100% VIRTUAL HACKATHON');
       setEmailMessage(
-        `Hello Builders,\n\nThe moment has arrived! Builders Arena 2026 officially kicks off today at 9:30 AM WAT.\n\nAll approved builders and finalist teams should join the official WhatsApp coordination group immediately for real-time announcements, track briefings, mentor pairings, and sprint check-ins.\n\n• Kickoff Time: Today, 9:30 AM WAT\n• Mode: Hybrid (Virtual Coding Sprint & Physical Check-In)\n• Join WhatsApp Channel: Click the link below to enter the builder room\n\nSharpen your tools and get ready to build!`
+        `Hello Builders,\n\nThank you for attending this morning's orientation session!\n\nIMPORTANT FORMAT UPDATE:\nPlease note that Builders Arena 2026 is now taking place entirely ONLINE. There will be no physical gathering — the entire sprint, mentorship sessions, and final project submissions/pitches are 100% virtual.\n\nIT'S TIME TO BUILD!\nThe sprint has officially begun. You and your team are expected to:\n1. Coordinate directly inside your team repositories.\n2. Ensure all your members are in the official WhatsApp group for mentor check-ins, sprint announcements, and submission guidelines.\n3. Reach out to mentors in the group if you need architectural or technical guidance.\n\nWe can't wait to see the incredible solutions you ship!`
       );
       setEmailActionText('JOIN OFFICIAL WHATSAPP GROUP');
       setEmailActionUrl('https://chat.whatsapp.com/FonHEx5bQpg4sf6ezp2oMR?s=cl&p=a&iam=2');
@@ -1370,7 +1370,7 @@ export const AdminPage: React.FC = () => {
                         activeTemplate === 'kickoff_now' ? 'bg-yellow-300' : 'bg-white hover:bg-gray-100'
                       }`}
                     >
-                      🚀 9:30 AM Kickoff & WhatsApp
+                      ⚡ 100% Online Sprint Update
                     </button>
                     <button
                       type="button"
