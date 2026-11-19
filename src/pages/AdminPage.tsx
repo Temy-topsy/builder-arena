@@ -349,7 +349,16 @@ export const AdminPage: React.FC = () => {
   // Email Helper Functions
   const handleSelectTemplate = (templateKey: string) => {
     setActiveTemplate(templateKey);
-    if (templateKey === 'finalist_selection') {
+    if (templateKey === 'kickoff_now') {
+      setEmailSubject('🚀 [Builders Arena 2026] Hackathon Kickoff! Starting 9:30 AM Today');
+      setEmailHeading('🚀 BUILDERS ARENA 2026 IS LIVE!');
+      setEmailBadge('HACKATHON KICKOFF');
+      setEmailMessage(
+        `Hello Builders,\n\nThe moment has arrived! Builders Arena 2026 officially kicks off today at 9:30 AM WAT.\n\nAll approved builders and finalist teams should join the official WhatsApp coordination group immediately for real-time announcements, track briefings, mentor pairings, and sprint check-ins.\n\n• Kickoff Time: Today, 9:30 AM WAT\n• Mode: Hybrid (Virtual Coding Sprint & Physical Check-In)\n• Join WhatsApp Channel: Click the link below to enter the builder room\n\nSharpen your tools and get ready to build!`
+      );
+      setEmailActionText('JOIN OFFICIAL WHATSAPP GROUP');
+      setEmailActionUrl('https://chat.whatsapp.com/FonHEx5bQpg4sf6ezp2oMR?s=cl&p=a&iam=2');
+    } else if (templateKey === 'finalist_selection') {
       setEmailSubject('[Builders Arena 2026] Congratulations! Your Team Has Been Selected as a Finalist!');
       setEmailHeading('🎉 CONGRATULATIONS! TOP 15 FINALIST SELECTION');
       setEmailBadge('FINALIST SELECTION');
@@ -357,7 +366,7 @@ export const AdminPage: React.FC = () => {
         `Hello Team,\n\nWe are thrilled to officially announce that your team has been selected into the Top 15 Finalist Cohort for Builders Arena 2026!\n\nKey Next Steps:\n1. Confirm Attendance: Ensure your full team is ready for both the Virtual Sprint and Physical Grand Finale.\n2. Join Finalist WhatsApp Channel: Connect with mentors and organizers.\n3. Prepare Your Environment: Have your Git repositories, dev stack, and APIs ready.\n\nSchedule:\n• Virtual Coding Sprint: 18th November 2026\n• Physical Grand Finale & Pitch: 19th – 20th November 2026 at OOU Tech Hub, ICT Building, Ago-Iwoye\n\nWe look forward to seeing your working prototype in action!`
       );
       setEmailActionText('JOIN FINALIST WHATSAPP');
-      setEmailActionUrl('https://wa.me/2348061764593');
+      setEmailActionUrl('https://chat.whatsapp.com/FonHEx5bQpg4sf6ezp2oMR?s=cl&p=a&iam=2');
     } else if (templateKey === 'schedule_reminder') {
       setEmailSubject('[Builders Arena 2026] Important Reminder: Grand Finale Schedule & Venue Details');
       setEmailHeading('🗓️ GRAND FINALE SCHEDULE & VENUE DETAILS');
@@ -1354,6 +1363,15 @@ export const AdminPage: React.FC = () => {
                     </label>
                   </div>
                   <div className="flex flex-wrap gap-2 text-[11px] font-sans">
+                    <button
+                      type="button"
+                      onClick={() => handleSelectTemplate('kickoff_now')}
+                      className={`px-2.5 py-1 rounded border border-black font-bold transition-colors ${
+                        activeTemplate === 'kickoff_now' ? 'bg-yellow-300' : 'bg-white hover:bg-gray-100'
+                      }`}
+                    >
+                      🚀 9:30 AM Kickoff & WhatsApp
+                    </button>
                     <button
                       type="button"
                       onClick={() => handleSelectTemplate('finalist_selection')}

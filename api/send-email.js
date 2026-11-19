@@ -143,7 +143,7 @@ function getRegistrationEmailHtml({
 
         <!-- Call to Action Buttons -->
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://wa.me/2348061764593" style="display: inline-block; background-color: #25D366; color: #000; padding: 14px 28px; text-decoration: none; font-weight: 900; font-size: 13px; text-transform: uppercase; border: 2px solid #000; box-shadow: 4px 4px 0px #000; border-radius: 6px; margin-right: 8px; margin-bottom: 12px;">
+          <a href="https://chat.whatsapp.com/FonHEx5bQpg4sf6ezp2oMR?s=cl&p=a&iam=2" style="display: inline-block; background-color: #25D366; color: #000; padding: 14px 28px; text-decoration: none; font-weight: 900; font-size: 13px; text-transform: uppercase; border: 2px solid #000; box-shadow: 4px 4px 0px #000; border-radius: 6px; margin-right: 8px; margin-bottom: 12px;">
             JOIN OFFICIAL WHATSAPP GROUP
           </a>
           <a href="https://builder-arena.vercel.app/register?lookup=true" style="display: inline-block; background-color: #FFFFFF; color: #000; padding: 14px 24px; text-decoration: none; font-weight: 900; font-size: 13px; text-transform: uppercase; border: 2px solid #000; box-shadow: 4px 4px 0px #000; border-radius: 6px; margin-bottom: 12px;">
